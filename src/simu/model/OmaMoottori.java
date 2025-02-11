@@ -110,14 +110,24 @@ public class OmaMoottori extends Moottori {
 	private void updateServiceTimeStats(Asiakas a) {
 		double serviceTime = a.getPoistumisaika() - a.getSaapumisaika();
 		if (a.getAge() <= 40) {
-			totalServiceTime18to40 += serviceTime;
+			totalServiceTime18to40 += serviceTime*checkAgeMultiplier(a);
 			count18to40++;
 		} else if (a.getAge() <= 60) {
-			totalServiceTime41to60 += serviceTime;
+			totalServiceTime41to60 += serviceTime*checkAgeMultiplier(a);
 			count41to60++;
 		} else {
-			totalServiceTime60Plus += serviceTime;
+			totalServiceTime60Plus += serviceTime*checkAgeMultiplier(a);
 			count60Plus++;
+		}
+	}
+
+	public double checkAgeMultiplier(Asiakas a){
+		if (a.getAge() <= 40) {
+			return 1.0;
+		} else if (a.getAge() <= 60) {
+			return 1.3;
+		}else{
+			return 1.6;
 		}
 	}
 
