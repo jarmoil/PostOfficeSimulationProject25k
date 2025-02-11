@@ -106,7 +106,7 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
-	// eritellään iän mukaan palveluajat
+	// eritellään iän mukaan palveluajat ja kerrotaan aika riippuen ikäluokasta
 	private void updateServiceTimeStats(Asiakas a) {
 		double serviceTime = a.getPoistumisaika() - a.getSaapumisaika();
 		if (a.getAge() <= 40) {
@@ -121,6 +121,7 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
+	// ikäluokkien kertoimet palveluajalle
 	public double checkAgeMultiplier(Asiakas a){
 		if (a.getAge() <= 40) {
 			return 1.0;
