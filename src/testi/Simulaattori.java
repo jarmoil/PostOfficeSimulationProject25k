@@ -11,7 +11,7 @@ public class Simulaattori { //Tekstipohjainen
 		
 		Trace.setTraceLevel(Level.INFO);
 		Moottori m = new OmaMoottori();
-		m.setSimulointiaika(20);
+		m.setSimulointiaika(100);
 		m.aja();
 		///
 	}

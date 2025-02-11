@@ -2,6 +2,8 @@ package simu.model;
 
 import simu.framework.*;
 import java.util.LinkedList;
+import java.util.Random;
+
 import eduni.distributions.ContinuousGenerator;
 
 // TODO:
@@ -17,6 +19,11 @@ public class Palvelupiste {
 	
 	private boolean varattu = false;
 
+	// Suorituskyky mittarit
+	private int servedCustomers = 0;
+	private double overallWaitingTime = 0;
+	private double overallServiceTime = 0;
+
 
 	public Palvelupiste(ContinuousGenerator generator, Tapahtumalista tapahtumalista, TapahtumanTyyppi tyyppi){
 		this.tapahtumalista = tapahtumalista;
@@ -27,6 +34,7 @@ public class Palvelupiste {
 
 
 	public void lisaaJonoon(Asiakas a){   // Jonon 1. asiakas aina palvelussa
+		a.setSaapumisaika(Kello.getInstance().getAika());
 		jono.add(a);
 		
 	}
@@ -34,19 +42,30 @@ public class Palvelupiste {
 
 	public Asiakas otaJonosta(){  // Poistetaan palvelussa ollut
 		varattu = false;
-		return jono.poll();
+		Asiakas poistettava = jono.poll();
+		if (poistettava != null) {
+			poistettava.setPoistumisaika(Kello.getInstance().getAika());
+			servedCustomers++;
+		}
+		return poistettava;
 	}
 
 
 	public void aloitaPalvelu(){  //Aloitetaan uusi palvelu, asiakas on jonossa palvelun aikana
-		
-		Trace.out(Trace.Level.INFO, "Aloitetaan uusi palvelu asiakkaalle " + jono.peek().getId());
+		if(jono.isEmpty()) return;
+
+		Asiakas asiakas = jono.peek();
+		double palveluaika = generator.sample();
+		double randomDelay = new Random().nextDouble() * 10;
+		overallWaitingTime += Kello.getInstance().getAika() - asiakas.getSaapumisaika() + randomDelay;
+		overallServiceTime += palveluaika;
 		
 		varattu = true;
-		double palveluaika = generator.sample();
-		tapahtumalista.lisaa(new Tapahtuma(skeduloitavanTapahtumanTyyppi,Kello.getInstance().getAika()+palveluaika));
-	}
+		tapahtumalista.lisaa(new Tapahtuma(skeduloitavanTapahtumanTyyppi,Kello.getInstance().getAika()+palveluaika+randomDelay));
 
+		Trace.out(Trace.Level.INFO, "Aloitetaan uusi palvelu asiakkaalle " + jono.peek().getId());
+
+	}
 
 
 	public boolean onVarattu(){
@@ -58,5 +77,28 @@ public class Palvelupiste {
 	public boolean onJonossa(){
 		return jono.size() != 0;
 	}
+
+	// Raportointi metodit
+
+	public double getAverageWaitingTime() {
+		return servedCustomers > 0 ? overallWaitingTime / servedCustomers : 0;
+	}
+
+	public double getAverageServiceTime() {
+		return servedCustomers > 0 ? overallServiceTime / servedCustomers : 0;
+	}
+
+	public int getServedCustomers() {
+		return servedCustomers;
+	}
+
+	public TapahtumanTyyppi getType() {
+		return skeduloitavanTapahtumanTyyppi;
+	}
+
+	public int getQueueLength() {
+		return jono.size();
+	}
+
 
 }
