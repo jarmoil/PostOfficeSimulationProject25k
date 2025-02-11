@@ -2,6 +2,8 @@ package simu.model;
 
 import simu.framework.*;
 
+import java.util.Random;
+
 // TODO:
 // Asiakas koodataan simulointimallin edellyttämällä tavalla (data!)
 public class Asiakas {
@@ -10,12 +12,23 @@ public class Asiakas {
 	private int id;
 	private static int i = 1;
 	private static long sum = 0;
-	
+	private static int age;
+
 	public Asiakas(){
-	    id = i++;
-	    
+		id = i++;
+
+		// Random ikä välillä 18 - 80
+		Random random = new Random();
+		age = random.nextInt(63) + 18; // 18-80
+
 		saapumisaika = Kello.getInstance().getAika();
-		Trace.out(Trace.Level.INFO, "Uusi asiakas nro " + id + " saapui klo "+saapumisaika);
+		Trace.out(Trace.Level.INFO, "Uusi asiakas nro " + id + " ikä " + age +" saapui klo "+saapumisaika);
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
 	}
 
 	public double getPoistumisaika() {
@@ -33,13 +46,13 @@ public class Asiakas {
 	public void setSaapumisaika(double saapumisaika) {
 		this.saapumisaika = saapumisaika;
 	}
-	
+
 
 
 	public int getId() {
 		return id;
 	}
-	
+
 	public void raportti(){
 		Trace.out(Trace.Level.INFO, "\nAsiakas "+id+ " valmis! ");
 		Trace.out(Trace.Level.INFO, "Asiakas "+id+ " saapui: " +saapumisaika);

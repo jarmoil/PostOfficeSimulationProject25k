@@ -14,6 +14,15 @@ public class OmaMoottori extends Moottori {
 	// Analyysia varten nyt vaan yksi tulostus
 	private int asiakasLkm;
 
+	// iän seuranta ja niiden jaottelu
+	private double totalServiceTime18to40 = 0;
+	private int count18to40 = 0;
+	private double totalServiceTime41to60 = 0;
+	private int count41to60 = 0;
+	private double totalServiceTime60Plus = 0;
+	private int count60Plus = 0;
+
+
 	public OmaMoottori() {
 		palvelupisteet = new Palvelupiste[4];
 
@@ -41,7 +50,17 @@ public class OmaMoottori extends Moottori {
 		switch ((TapahtumanTyyppi) t.getTyyppi()) {
 			case ARR1:
 				a = new Asiakas();
-				if (random.nextBoolean()) {
+				// annetaan eri todennäköisyydet iän perusteella
+				double probability;
+				if (a.getAge() <= 40) {
+					probability = 0.7; 		// 70% todennäköisyys
+				} else if (a.getAge() <= 60) {
+					probability = 0.3; 		// 30% todennäköisyys
+				} else {
+					probability = 0.1; 		// 10% todennäköisyys
+				}
+
+				if (random.nextDouble() < probability) {
 					palvelupisteet[0].lisaaJonoon(a); // Pakettiautomaatti
 					System.out.println("Asiakas " + a.getId() + " saapui pakettiautomaatille.");
 				} else {
@@ -54,6 +73,7 @@ public class OmaMoottori extends Moottori {
 				asiakasLkm++;
 				a = palvelupisteet[0].otaJonosta();
 				a.setPoistumisaika(Kello.getInstance().getAika());
+				updateServiceTimeStats(a);
 				System.out.println("Asiakas " + a.getId() + " valmis pakettiautomaatilta.");
 				a.raportti();
 				break;
@@ -71,6 +91,7 @@ public class OmaMoottori extends Moottori {
 				asiakasLkm++;
 				a = palvelupisteet[2].otaJonosta();
 				a.setPoistumisaika(Kello.getInstance().getAika());
+				updateServiceTimeStats(a);
 				System.out.println("Asiakas " + a.getId() + " valmis nouto/lähetä palvelutiskiltä");
 				a.raportti();
 				break;
@@ -78,9 +99,25 @@ public class OmaMoottori extends Moottori {
 				asiakasLkm++;
 				a = palvelupisteet[3].otaJonosta();
 				a.setPoistumisaika(Kello.getInstance().getAika());
+				updateServiceTimeStats(a);
 				System.out.println("Asiakas " + a.getId() + " valmis erityistapaus palvelutiskiltä");
 				a.raportti();
 				break;
+		}
+	}
+
+	// eritellään iän mukaan palveluajat
+	private void updateServiceTimeStats(Asiakas a) {
+		double serviceTime = a.getPoistumisaika() - a.getSaapumisaika();
+		if (a.getAge() <= 40) {
+			totalServiceTime18to40 += serviceTime;
+			count18to40++;
+		} else if (a.getAge() <= 60) {
+			totalServiceTime41to60 += serviceTime;
+			count41to60++;
+		} else {
+			totalServiceTime60Plus += serviceTime;
+			count60Plus++;
 		}
 	}
 
@@ -107,5 +144,12 @@ public class OmaMoottori extends Moottori {
 			System.out.println("	Keskimääräinen palveluaika: " + p.getAverageServiceTime());
 			System.out.println("--------------------------------");
 		}
+
+		// tulostetaan iän mukaan palveluajat erikseen
+		System.out.println("\nAsiakkaiden keskimääräiset palveluajat iän mukaan:");
+		System.out.println("Ikä 18-40: " + (count18to40 > 0 ? totalServiceTime18to40 / count18to40 : 0));
+		System.out.println("Ikä 41-60: " + (count41to60 > 0 ? totalServiceTime41to60 / count41to60 : 0));
+		System.out.println("Ikä 61+: " + (count60Plus > 0 ? totalServiceTime60Plus / count60Plus : 0));
+		System.out.println("--------------------------------");
 	}
 }
