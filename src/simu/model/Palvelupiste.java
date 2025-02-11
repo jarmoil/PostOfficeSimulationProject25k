@@ -32,13 +32,11 @@ public class Palvelupiste {
 				
 	}
 
-
 	public void lisaaJonoon(Asiakas a){   // Jonon 1. asiakas aina palvelussa
 		a.setSaapumisaika(Kello.getInstance().getAika());
 		jono.add(a);
 		
 	}
-
 
 	public Asiakas otaJonosta(){  // Poistetaan palvelussa ollut
 		varattu = false;
@@ -49,7 +47,6 @@ public class Palvelupiste {
 		}
 		return poistettava;
 	}
-
 
 	public void aloitaPalvelu(){  //Aloitetaan uusi palvelu, asiakas on jonossa palvelun aikana
 		if(jono.isEmpty()) return;
@@ -83,8 +80,6 @@ public class Palvelupiste {
 		return varattu;
 	}
 
-
-
 	public boolean onJonossa(){
 		return jono.size() != 0;
 	}
@@ -110,6 +105,5 @@ public class Palvelupiste {
 	public int getQueueLength() {
 		return jono.size();
 	}
-
 
 }
