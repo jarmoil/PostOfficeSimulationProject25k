@@ -106,29 +106,18 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
-	// eritellään iän mukaan palveluajat ja kerrotaan aika riippuen ikäluokasta
+	// eritellään iän mukaan palveluajat
 	private void updateServiceTimeStats(Asiakas a) {
 		double serviceTime = a.getPoistumisaika() - a.getSaapumisaika();
 		if (a.getAge() <= 40) {
-			totalServiceTime18to40 += serviceTime*checkAgeMultiplier(a);
+			totalServiceTime18to40 += serviceTime;
 			count18to40++;
 		} else if (a.getAge() <= 60) {
-			totalServiceTime41to60 += serviceTime*checkAgeMultiplier(a);
+			totalServiceTime41to60 += serviceTime;
 			count41to60++;
 		} else {
-			totalServiceTime60Plus += serviceTime*checkAgeMultiplier(a);
+			totalServiceTime60Plus += serviceTime;
 			count60Plus++;
-		}
-	}
-
-	// ikäluokkien kertoimet palveluajalle
-	public double checkAgeMultiplier(Asiakas a){
-		if (a.getAge() <= 40) {
-			return 1.0;
-		} else if (a.getAge() <= 60) {
-			return 1.3;
-		}else{
-			return 1.6;
 		}
 	}
 

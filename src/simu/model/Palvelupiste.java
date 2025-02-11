@@ -54,8 +54,9 @@ public class Palvelupiste {
 	public void aloitaPalvelu(){  //Aloitetaan uusi palvelu, asiakas on jonossa palvelun aikana
 		if(jono.isEmpty()) return;
 
+
 		Asiakas asiakas = jono.peek();
-		double palveluaika = generator.sample();
+		double palveluaika = generator.sample() * checkAgeMultiplier(asiakas);
 		double randomDelay = new Random().nextDouble() * 10;
 		overallWaitingTime += Kello.getInstance().getAika() - asiakas.getSaapumisaika() + randomDelay;
 		overallServiceTime += palveluaika;
@@ -67,6 +68,16 @@ public class Palvelupiste {
 
 	}
 
+	// ikäluokkien kertoimet palveluajalle
+	public double checkAgeMultiplier(Asiakas a){
+		if (a.getAge() <= 40) {
+			return 1.0;
+		} else if (a.getAge() <= 60) {
+			return 1.3;
+		}else{
+			return 1.6;
+		}
+	}
 
 	public boolean onVarattu(){
 		return varattu;
