@@ -23,6 +23,7 @@ public class Palvelupiste {
 	private int servedCustomers = 0;
 	private double overallWaitingTime = 0;
 	private double overallServiceTime = 0;
+	private double totalTime = 0;
 
 
 	public Palvelupiste(ContinuousGenerator generator, Tapahtumalista tapahtumalista, TapahtumanTyyppi tyyppi){
@@ -61,6 +62,7 @@ public class Palvelupiste {
 		varattu = true;
 		tapahtumalista.lisaa(new Tapahtuma(skeduloitavanTapahtumanTyyppi,Kello.getInstance().getAika()+palveluaika+randomDelay));
 
+		totalTime += palveluaika + randomDelay;
 		Trace.out(Trace.Level.INFO, "Aloitetaan uusi palvelu asiakkaalle " + jono.peek().getId());
 
 	}
@@ -105,5 +107,7 @@ public class Palvelupiste {
 	public int getQueueLength() {
 		return jono.size();
 	}
+
+	public double getTotalTime() { return totalTime;}
 
 }

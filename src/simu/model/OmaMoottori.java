@@ -11,8 +11,6 @@ public class OmaMoottori extends Moottori {
 	private Palvelupiste[] palvelupisteet;
 	private Random random;
 
-	// Analyysia varten nyt vaan yksi tulostus
-	private int asiakasLkm;
 
 	// iän seuranta ja niiden jaottelu
 	private double totalServiceTime18to40 = 0;
@@ -22,91 +20,101 @@ public class OmaMoottori extends Moottori {
 	private double totalServiceTime60Plus = 0;
 	private int count60Plus = 0;
 
+	// Probabilities
+	private static final double PROBABILITY_18TO40 = 0.7;
+	private static final double PROBABILITY_41TO60 = 0.3;
+	private static final double PROBABILITY_60PLUS = 0.1;
 
 	public OmaMoottori() {
 		palvelupisteet = new Palvelupiste[4];
 
-		// Palvelupisteet: Pakettiautomaatti, palvelunvalinta, palvelutiski 1, palvelutiski 2
-		palvelupisteet[0] = new Palvelupiste(new Normal(5, 2), tapahtumalista, TapahtumanTyyppi.PAKETTIAUTOMAATTI);
-		palvelupisteet[1] = new Palvelupiste(new Normal(3, 1), tapahtumalista, TapahtumanTyyppi.PALVELUNVALINTA);
-		palvelupisteet[2] = new Palvelupiste(new Normal(10, 6), tapahtumalista, TapahtumanTyyppi.NOUTOLAHETA);
-		palvelupisteet[3] = new Palvelupiste(new Normal(10, 6), tapahtumalista, TapahtumanTyyppi.ERITYISTAPAUKSET);
+		// Initialize service points
+		palvelupisteet[0] = new Palvelupiste(new Normal(4, 3), tapahtumalista, TapahtumanTyyppi.PAKETTIAUTOMAATTI);
+		palvelupisteet[1] = new Palvelupiste(new Normal(2, 2), tapahtumalista, TapahtumanTyyppi.PALVELUNVALINTA);
+		palvelupisteet[2] = new Palvelupiste(new Normal(5, 4), tapahtumalista, TapahtumanTyyppi.NOUTOLAHETA);
+		palvelupisteet[3] = new Palvelupiste(new Normal(7, 4), tapahtumalista, TapahtumanTyyppi.ERITYISTAPAUKSET);
 
 		saapumisprosessi = new Saapumisprosessi(new Negexp(15, 5), tapahtumalista, TapahtumanTyyppi.ARR1);
 		random = new Random();
 
-		// Alustetaan analyysi
-		asiakasLkm = 0;
 	}
 
 	@Override
 	protected void alustukset() {
-		saapumisprosessi.generoiSeuraava(); // Ensimmäinen saapuminen järjestelmään
+		saapumisprosessi.generoiSeuraava(); // First arrival in the system
 	}
 
 	@Override
-	protected void suoritaTapahtuma(Tapahtuma t) {  // B-vaiheen tapahtumat
+	protected void suoritaTapahtuma(Tapahtuma t) {
 		Asiakas a;
 		switch ((TapahtumanTyyppi) t.getTyyppi()) {
 			case ARR1:
 				a = new Asiakas();
-				// annetaan eri todennäköisyydet iän perusteella
-				double probability;
-				if (a.getAge() <= 40) {
-					probability = 0.7; 		// 70% todennäköisyys
-				} else if (a.getAge() <= 60) {
-					probability = 0.3; 		// 30% todennäköisyys
-				} else {
-					probability = 0.1; 		// 10% todennäköisyys
-				}
-
-				if (random.nextDouble() < probability) {
-					palvelupisteet[0].lisaaJonoon(a); // Pakettiautomaatti
-					System.out.println("Asiakas " + a.getId() + " saapui pakettiautomaatille.");
-				} else {
-					palvelupisteet[1].lisaaJonoon(a); // Palvelun valinta
-					System.out.println("Asiakas " + a.getId() + " saapui palvelunvalintaan.");
-				}
+				handleArrival(a);
 				saapumisprosessi.generoiSeuraava();
 				break;
+
 			case PAKETTIAUTOMAATTI:
-				asiakasLkm++;
 				a = palvelupisteet[0].otaJonosta();
-				a.setPoistumisaika(Kello.getInstance().getAika());
-				updateServiceTimeStats(a);
-				System.out.println("Asiakas " + a.getId() + " valmis pakettiautomaatilta.");
-				a.raportti();
+				processCustomer(a, palvelupisteet[0]);
 				break;
+
 			case PALVELUNVALINTA:
 				a = palvelupisteet[1].otaJonosta();
-				if (random.nextBoolean()) {
-					palvelupisteet[2].lisaaJonoon(a); // Palvelutiski 1
-					System.out.println("Asiakas " + a.getId() + " ohjattu nouto/lähetä palvelutiskille.");
-				} else {
-					palvelupisteet[3].lisaaJonoon(a); // Palvelutiski 2
-					System.out.println("Asiakas " + a.getId() + " ohjattu erityistapaus palvelutiskille.");
-				}
+				redirectToService(a);
 				break;
+
 			case NOUTOLAHETA:
-				asiakasLkm++;
 				a = palvelupisteet[2].otaJonosta();
-				a.setPoistumisaika(Kello.getInstance().getAika());
-				updateServiceTimeStats(a);
-				System.out.println("Asiakas " + a.getId() + " valmis nouto/lähetä palvelutiskiltä");
-				a.raportti();
+				processCustomer(a, palvelupisteet[2]);
 				break;
+
 			case ERITYISTAPAUKSET:
-				asiakasLkm++;
 				a = palvelupisteet[3].otaJonosta();
-				a.setPoistumisaika(Kello.getInstance().getAika());
-				updateServiceTimeStats(a);
-				System.out.println("Asiakas " + a.getId() + " valmis erityistapaus palvelutiskiltä");
-				a.raportti();
+				processCustomer(a, palvelupisteet[3]);
 				break;
 		}
 	}
 
-	// eritellään iän mukaan palveluajat
+	private void handleArrival(Asiakas a) {
+		double probability = getArrivalProbability(a);
+		if (random.nextDouble() < probability) {
+			palvelupisteet[0].lisaaJonoon(a); // Pakettiautomaatti
+			printArrival(a, "pakettiautomaatille");
+		} else {
+			palvelupisteet[1].lisaaJonoon(a); // Palvelun valinta
+			printArrival(a, "palvelunvalintaan");
+		}
+	}
+
+	private double getArrivalProbability(Asiakas a) {
+		if (a.getAge() <= 40) return PROBABILITY_18TO40;
+		if (a.getAge() <= 60) return PROBABILITY_41TO60;
+		return PROBABILITY_60PLUS;
+	}
+
+	private void printArrival(Asiakas a, String servicePoint) {
+		System.out.println("Asiakas " + a.getId() + " saapui " + servicePoint + ".");
+	}
+
+	private void redirectToService(Asiakas a) {
+		if (random.nextBoolean()) {
+			palvelupisteet[2].lisaaJonoon(a); // Nouto/Lähetä
+			System.out.println("Asiakas " + a.getId() + " ohjattu nouto/lähetä palvelutiskille.");
+		} else {
+			palvelupisteet[3].lisaaJonoon(a); // Erityistapaus
+			System.out.println("Asiakas " + a.getId() + " ohjattu erityistapaus palvelutiskille.");
+		}
+	}
+
+	private void processCustomer(Asiakas a, Palvelupiste p) {
+		a.setPoistumisaika(Kello.getInstance().getAika());
+		updateServiceTimeStats(a);
+		System.out.println("Asiakas " + a.getId() + " valmis " + p.getType() + " palvelutiskiltä");
+		a.raportti();
+	}
+
+	// Update service time statistics based on age group
 	private void updateServiceTimeStats(Asiakas a) {
 		double serviceTime = a.getPoistumisaika() - a.getSaapumisaika();
 		if (a.getAge() <= 40) {
@@ -133,19 +141,27 @@ public class OmaMoottori extends Moottori {
 	@Override
 	protected void tulokset() {
 		System.out.println("\nSimulointi päättyi kello " + Kello.getInstance().getAika());
-		System.out.println("Asiakkaita käsitelty (Jonossa tai poistunut): " + asiakasLkm);
-
-		System.out.println("\nPalvelupisteiden tilastot:");
+		System.out.println("Palvellut asiakkaat (Poistumiseen asti): " + Asiakas.palvellut);
+		// Print service point statistics
 		for (Palvelupiste p : palvelupisteet) {
-			System.out.println("Palvelupiste: " + p.getType());
-			System.out.println("	Jonossa asiakkaita: " + p.getQueueLength());
-			System.out.println("	Palveltujen asiakkaiden määrä: " + p.getServedCustomers());
-			System.out.println("	Keskimääräinen jonotusaika: " + p.getAverageWaitingTime());
-			System.out.println("	Keskimääräinen palveluaika: " + p.getAverageServiceTime());
-			System.out.println("--------------------------------");
+			printServicePointStats(p);
 		}
 
-		// tulostetaan iän mukaan palveluajat erikseen
+		// Print average service time by age group
+		printAverageServiceTimeByAge();
+	}
+
+	private void printServicePointStats(Palvelupiste p) {
+		System.out.println("\nPalvelupiste: " + p.getType());
+		System.out.println("  Jonossa asiakkaita: " + p.getQueueLength());
+		System.out.println("  Palveltujen asiakkaiden määrä: " + p.getServedCustomers());
+		System.out.println("  Keskimääräinen jonotusaika: " + p.getAverageWaitingTime());
+		System.out.println("  Keskimääräinen palveluaika: " + p.getAverageServiceTime());
+		System.out.println("  Kokonaisaika: " + p.getTotalTime());
+		System.out.println("--------------------------------");
+	}
+
+	private void printAverageServiceTimeByAge() {
 		System.out.println("\nAsiakkaiden keskimääräiset palveluajat iän mukaan:");
 		System.out.println("Ikä 18-40: " + (count18to40 > 0 ? totalServiceTime18to40 / count18to40 : 0));
 		System.out.println("Ikä 41-60: " + (count41to60 > 0 ? totalServiceTime41to60 / count41to60 : 0));

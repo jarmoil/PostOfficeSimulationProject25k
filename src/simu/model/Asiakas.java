@@ -13,6 +13,7 @@ public class Asiakas {
 	private static int i = 1;
 	private static long sum = 0;
 	private static int age;
+	public static int palvellut = 0;
 
 	public Asiakas(){
 		id = i++;
@@ -54,6 +55,7 @@ public class Asiakas {
 	}
 
 	public void raportti(){
+		palvellut++;
 		Trace.out(Trace.Level.INFO, "\nAsiakas "+id+ " valmis! ");
 		Trace.out(Trace.Level.INFO, "Asiakas "+id+ " saapui: " +saapumisaika);
 		Trace.out(Trace.Level.INFO,"Asiakas "+id+ " poistui: " +poistumisaika);
@@ -62,5 +64,7 @@ public class Asiakas {
 		double keskiarvo = sum/id;
 		System.out.println("Asiakkaiden läpimenoaikojen keskiarvo tähän asti "+ keskiarvo);
 	}
+
+	public int getPalvellut() { return palvellut; }
 
 }
