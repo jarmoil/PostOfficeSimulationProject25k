@@ -44,13 +44,11 @@ public class OmaMoottori extends Moottori {
 
 	@Override
 	protected void alustukset() {
-		System.out.println("Toimiiko saapumisprosessi?");
 		saapumisprosessi.generoiSeuraava(); // First arrival in the system
 	}
 
 	@Override
 	protected void suoritaTapahtuma(Tapahtuma t) {
-		System.out.println("Toimiiko suoritatapahtuma?");
 		Asiakas a;
 		switch ((TapahtumanTyyppi) t.getTyyppi()) {
 			case ARR1:
