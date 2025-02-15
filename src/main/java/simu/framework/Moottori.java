@@ -1,14 +1,20 @@
 package simu.framework;
+import controller.IKontrolleriForM; // UUSI
 
-public abstract class Moottori {
+public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÄÄRITYKSET
 	
 	private double simulointiaika = 0;
+	private long viive = 0;
 	
 	private Kello kello;
 	
 	protected Tapahtumalista tapahtumalista;
 
-	public Moottori(){
+	protected IKontrolleriForM kontrolleri; // UUSI
+
+	public Moottori(IKontrolleriForM kontrolleri){ // UUSITTU
+
+		this.kontrolleri = kontrolleri; //UUSI
 
 		kello = Kello.getInstance(); // Otetaan kello muuttujaan yksinkertaistamaan koodia
 		
@@ -18,15 +24,26 @@ public abstract class Moottori {
 		
 		
 	}
-
+	@Override
 	public void setSimulointiaika(double aika) {
 		simulointiaika = aika;
 	}
+
+	@Override // UUSI
+	public void setViive(long viive) {
+		this.viive = viive;
+	}
+
+	@Override // UUSI
+	public long getViive() {
+		return viive;
+	}
 	
 	
-	public void aja(){
+	public void run(){
 		alustukset(); // luodaan mm. ensimmäinen tapahtuma
 		while (simuloidaan()){
+			viive(); // UUSI
 			
 			Trace.out(Trace.Level.INFO, "\nA-vaihe: kello on " + nykyaika());
 			kello.setAika(nykyaika());
@@ -54,6 +71,15 @@ public abstract class Moottori {
 	
 	private boolean simuloidaan(){
 		return kello.getAika() < simulointiaika;
+	}
+
+	private void viive() { // UUSI
+		Trace.out(Trace.Level.INFO, "Viive " + viive);
+		try {
+			sleep(viive);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected abstract void suoritaTapahtuma(Tapahtuma t);  // Määritellään simu.model-pakkauksessa Moottorin aliluokassa

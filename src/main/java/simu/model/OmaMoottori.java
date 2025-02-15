@@ -1,5 +1,6 @@
 package simu.model;
 
+import controller.IKontrolleriForM;
 import simu.framework.*;
 import eduni.distributions.Negexp;
 import eduni.distributions.Normal;
@@ -25,7 +26,9 @@ public class OmaMoottori extends Moottori {
 	private static final double PROBABILITY_41TO60 = 0.3;
 	private static final double PROBABILITY_60PLUS = 0.1;
 
-	public OmaMoottori() {
+	public OmaMoottori(IKontrolleriForM kontrolleri) {
+		super (kontrolleri);
+
 		palvelupisteet = new Palvelupiste[4];
 
 		// Initialize service points
@@ -41,17 +44,20 @@ public class OmaMoottori extends Moottori {
 
 	@Override
 	protected void alustukset() {
+		System.out.println("Toimiiko saapumisprosessi?");
 		saapumisprosessi.generoiSeuraava(); // First arrival in the system
 	}
 
 	@Override
 	protected void suoritaTapahtuma(Tapahtuma t) {
+		System.out.println("Toimiiko suoritatapahtuma?");
 		Asiakas a;
 		switch ((TapahtumanTyyppi) t.getTyyppi()) {
 			case ARR1:
 				a = new Asiakas();
 				handleArrival(a);
 				saapumisprosessi.generoiSeuraava();
+				kontrolleri.visualisoiAsiakas(); // UUSI
 				break;
 
 			case PAKETTIAUTOMAATTI:
@@ -149,6 +155,9 @@ public class OmaMoottori extends Moottori {
 
 		// Print average service time by age group
 		printAverageServiceTimeByAge();
+
+		// UUTTA graafista
+		kontrolleri.naytaLoppuaika(Kello.getInstance().getAika());
 	}
 
 	private void printServicePointStats(Palvelupiste p) {

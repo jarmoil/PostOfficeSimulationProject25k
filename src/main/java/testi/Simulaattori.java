@@ -1,4 +1,4 @@
-package testi;
+/*package testi;
 
 import simu.framework.Moottori;
 import simu.framework.Trace;
@@ -16,3 +16,4 @@ public class Simulaattori { //Tekstipohjainen
 		///
 	}
 }
+*/
