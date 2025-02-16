@@ -20,9 +20,8 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M√
 		
 		tapahtumalista = new Tapahtumalista();
 		
-		// Palvelupisteet luodaan simu.model-pakkauksessa Moottorin aliluokassa 
-		
-		
+		// Palvelupisteet luodaan simu.model-pakkauksessa Moottorin aliluokassa
+
 	}
 	@Override
 	public void setSimulointiaika(double aika) {
@@ -38,8 +37,7 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M√
 	public long getViive() {
 		return viive;
 	}
-	
-	
+
 	public void run(){
 		alustukset(); // luodaan mm. ensimm√§inen tapahtuma
 		while (simuloidaan()){

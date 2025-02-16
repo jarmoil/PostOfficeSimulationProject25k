@@ -35,5 +35,10 @@ public class Visualisointi2 extends Canvas implements IVisualisointi{
 
     }
 
+    /*public void uusiPalvelupiste() {
+        gc.setFill(Color.BROWN);
+        gc.fillRect(200, 200, 20, 40);
+    }*/
+
 
 }

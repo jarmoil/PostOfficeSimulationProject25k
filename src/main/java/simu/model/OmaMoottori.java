@@ -45,6 +45,9 @@ public class OmaMoottori extends Moottori {
 	@Override
 	protected void alustukset() {
 		saapumisprosessi.generoiSeuraava(); // First arrival in the system
+
+		// Johonkin tää roska
+		//kontrolleri.visualisoiPalvelupiste();
 	}
 
 	@Override

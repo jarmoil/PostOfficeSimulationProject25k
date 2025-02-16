@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import simu.framework.Trace;
@@ -30,13 +31,25 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private TextField aika;
     private TextField viive;
     private Label tulos;
+    private Label palvellutAsiakasMaara;
     private Label aikaLabel;
     private Label viiveLabel;
     private Label tulosLabel;
+    private Label palvellutLabel;
+    private Label ikaKeskPalveluaika;
+    private Label ikaNuori;
+    private Label ikaKeski;
+    private Label ikaVanha;
+    private Label tulosIkaNuori;
+    private Label tulosIkaKeski;
+    private Label tulosIkaVanha;
 
     private Button kaynnistaButton;
     private Button hidastaButton;
     private Button nopeutaButton;
+    private Button pysaytaButton;
+    private Button jatkaButton;
+
 
     private IVisualisointi naytto;
 
@@ -83,6 +96,16 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             nopeutaButton.setText("Nopeuta");
             nopeutaButton.setOnAction(e -> kontrolleri.nopeuta());
 
+            jatkaButton = new Button();
+            jatkaButton.setText("Jatka");
+            //Pitää tehdä sisältö tälle nappulalle
+            //jatkaButton.setOnAction(e -> kontrolleri.jatka());
+
+            pysaytaButton = new Button();
+            pysaytaButton.setText("Pysäytä");
+            //Pitää tehdä sisältö tälle nappulalle
+            //pysaytaButton.setOnAction(e -> kontrolleri.pysayta());
+
             aikaLabel = new Label("Simulointiaika:");
             aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
             aika = new TextField("Syötä aika");
@@ -101,31 +124,91 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             tulos.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
             tulos.setPrefWidth(150);
 
-            HBox hBox = new HBox();
-            hBox.setPadding(new Insets(15, 12, 15, 12)); // marginaalit ylÃ¤, oikea, ala, vasen
-            hBox.setSpacing(10);   // noodien välimatka 10 pikseliä
+            ikaKeskPalveluaika = new Label("Keskimääräinen palveluaika iän mukaan:");
+            ikaKeskPalveluaika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            ikaKeskPalveluaika.setPrefWidth(150);
+
+            ikaNuori = new Label("18 - 40v: ");
+            ikaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaNuori = new Label();
+            tulosIkaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaNuori.setPrefWidth(150);
+
+            ikaKeski = new Label("41 - 60v: ");
+            ikaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaKeski = new Label();
+            tulosIkaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaKeski.setPrefWidth(150);
+
+            ikaVanha = new Label("61v +: ");
+            ikaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaVanha = new Label();
+            tulosIkaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaVanha.setPrefWidth(150);
+
+
+            palvellutLabel = new Label("Palvellut asiakkaat:");
+            palvellutLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            palvellutAsiakasMaara = new Label();
+            palvellutAsiakasMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            palvellutAsiakasMaara.setPrefWidth(150);
+
+            // Pohjan luonti pitää vielä modifioida, aika maanantai malli atm.
+
+            // BorderPane pääroska minkä sisällä kaikki muu
+            BorderPane root = new BorderPane();
+            root.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+            root.setPadding(new Insets(15, 1, 15, 1)); // margins top, right, bottom, left
+
+            VBox labelBox = new VBox();
+            labelBox.setSpacing(10);   // spacing between nodes 10 pixels
 
             GridPane grid = new GridPane();
-            grid.setAlignment(Pos.CENTER);
+            grid.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+            grid.setAlignment(Pos.TOP_LEFT);
             grid.setVgap(10);
             grid.setHgap(5);
 
             grid.add(aikaLabel, 0, 0);   // sarake, rivi
-            grid.add(aika, 1, 0);          // sarake, rivi
-            grid.add(viiveLabel, 0, 1);      // sarake, rivi
-            grid.add(viive, 1, 1);           // sarake, rivi
-            grid.add(tulosLabel, 0, 2);      // sarake, rivi
-            grid.add(tulos, 1, 2);           // sarake, rivi
-            grid.add(kaynnistaButton, 0, 3);  // sarake, rivi
-            grid.add(nopeutaButton, 0, 4);   // sarake, rivi
-            grid.add(hidastaButton, 1, 4);   // sarake, rivi
+            grid.add(aika, 1, 0);
+            grid.add(viiveLabel, 0, 1);
+            grid.add(viive, 1, 1);
+            grid.add(tulosLabel, 0, 2);
+            grid.add(tulos, 1, 2);
+            grid.add(ikaKeskPalveluaika, 0, 4);
+            grid.add(ikaNuori, 0, 5);
+            grid.add(tulosIkaNuori, 1, 5);
+            grid.add(ikaKeski, 0, 6);
+            grid.add(tulosIkaKeski, 1, 6);
+            grid.add(ikaVanha, 0, 7);
+            grid.add(tulosIkaVanha, 1, 7);
+            grid.add(palvellutLabel, 0, 3);
+            grid.add(palvellutAsiakasMaara, 1, 3);
+
+            labelBox.getChildren().add(grid);
 
             naytto = new Visualisointi(400, 200);
 
-            // TÃ¤ytetÃ¤Ã¤n boxi:
-            hBox.getChildren().addAll(grid, (Canvas) naytto);
+            // Canvas skaalaus ei toimi vielä kunnolla !!
+            Canvas canvas = (Canvas) naytto;
+            canvas.widthProperty().bind(root.widthProperty().subtract(labelBox.widthProperty()).subtract(20));
+            canvas.heightProperty().bind(root.heightProperty().subtract(70)); // Adjusted height binding
 
-            Scene scene = new Scene(hBox);
+
+            // HBox näppäimille
+            HBox buttonBox = new HBox();
+            buttonBox.setAlignment(Pos.BOTTOM_CENTER);
+            buttonBox.setSpacing(10); // spacing between buttons
+            buttonBox.setPadding(new Insets(15, 12, 15, 12)); // margins top, right, bottom, left
+            buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton, jatkaButton, pysaytaButton);
+            buttonBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+            // BorderPanen asettelu
+            root.setLeft(labelBox);
+            root.setCenter(canvas);
+            root.setBottom(buttonBox);
+
+            Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();
 
@@ -153,6 +236,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.tulos.setText(formatter.format(aika));
     }
+
+
 
 
     @Override

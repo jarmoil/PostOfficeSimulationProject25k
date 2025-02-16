@@ -7,5 +7,6 @@ public interface IVisualisointi {
 
     public void uusiAsiakas();
 
+    // public void uusiPalvelupiste();
 }
 

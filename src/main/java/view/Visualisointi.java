@@ -20,7 +20,7 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
 
     public void tyhjennaNaytto() {
-        gc.setFill(Color.YELLOW);
+        gc.setFill(Color.SANDYBROWN);
         gc.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
@@ -29,8 +29,13 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         gc.fillOval(i,j,10,10);
 
         i = (i + 10) % this.getWidth();
-        //j = (j + 12) % this.getHeight();
+        j = this.getHeight() / 2;
         if (i==0) j+=10;
     }
-
+    public void uusiPalvelupiste(int x, int y) {
+        gc.setFill(Color.BROWN);
+        gc.fillRect(i,j,40,20);
+        i = x;
+        j = y;
+    }
 }
