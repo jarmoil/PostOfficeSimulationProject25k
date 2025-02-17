@@ -2,6 +2,11 @@ package view;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.paint.Color;
 
 public class Visualisointi extends Canvas implements IVisualisointi{
@@ -32,6 +37,10 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         j = this.getHeight() / 2;
         if (i==0) j+=10;
     }
+
+    //jotenkin tällein, pitää varmaan jokaiselle palvelupisteelle
+    // olla oma metodi et ne pystyy sijottamaan eri kohtiin, kai?
+
     /*public void uusiPalvelupiste(int x, int y) {
         gc.setFill(Color.BROWN);
         gc.fillRect(i,j,40,20);

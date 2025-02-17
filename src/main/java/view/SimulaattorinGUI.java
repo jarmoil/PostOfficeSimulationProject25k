@@ -125,7 +125,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             tulos.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
             tulos.setPrefWidth(150);
 
-            ikaKeskPalveluaika = new Label("Keskimääräinen palveluaika iän mukaan:");
+            ikaKeskPalveluaika = new Label("Keskim. palveluaika iän mukaan:");
             ikaKeskPalveluaika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
             ikaKeskPalveluaika.setPrefWidth(150);
 
@@ -148,7 +148,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             tulosIkaVanha.setPrefWidth(150);
 
 
-            palvellutLabel = new Label("Palvellut asiakkaat:");
+            palvellutLabel = new Label("Asiakkaat: ");
             palvellutLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
             palvellutAsiakasMaara = new Label();
             palvellutAsiakasMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -156,7 +156,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
             // Pohjan luonti pitää vielä modifioida, aika maanantai malli atm.
 
-            //Taustakuvat
+            //Taustakuva
             Image backgroundImage = new Image(getClass().getResourceAsStream("/Backgroundimg.jpg"));
             BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
@@ -169,11 +169,23 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             labelBox.setSpacing(10);   // spacing between nodes 10 pixels
 
             GridPane grid = new GridPane();
+            grid.setPadding(new Insets(15, 12, 15, 12)); // margins top, right, bottom, left
             grid.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
             grid.setAlignment(Pos.TOP_LEFT);
             grid.setOpacity(0.8);
-            grid.setVgap(20);
+            grid.setVgap(10);
             grid.setHgap(5);
+
+
+            // Column constraints
+            ColumnConstraints column1 = new ColumnConstraints();
+            ColumnConstraints column2 = new ColumnConstraints();
+            grid.getColumnConstraints().addAll(column1, column2);
+            column1.setPercentWidth(50);
+            column2.setPercentWidth(50);
+
+            // Horizontal alignment
+            //grid.setGridLinesVisible(true);
 
             grid.add(aikaLabel, 0, 0);   // sarake, rivi
             grid.add(aika, 1, 0);
@@ -181,15 +193,16 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             grid.add(viive, 1, 1);
             grid.add(tulosLabel, 0, 2);
             grid.add(tulos, 1, 2);
-            grid.add(ikaKeskPalveluaika, 0, 4);
+            grid.add(palvellutLabel, 0, 3);
+            grid.add(palvellutAsiakasMaara, 1, 3);
+            ikaKeskPalveluaika.setPrefWidth(300);
+            grid.add(ikaKeskPalveluaika, 0, 4,2,1);
             grid.add(ikaNuori, 0, 5);
             grid.add(tulosIkaNuori, 1, 5);
             grid.add(ikaKeski, 0, 6);
             grid.add(tulosIkaKeski, 1, 6);
             grid.add(ikaVanha, 0, 7);
             grid.add(tulosIkaVanha, 1, 7);
-            grid.add(palvellutLabel, 0, 3);
-            grid.add(palvellutAsiakasMaara, 1, 3);
 
             labelBox.getChildren().add(grid);
 
