@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -155,9 +156,13 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
             // Pohjan luonti pitää vielä modifioida, aika maanantai malli atm.
 
+            //Taustakuvat
+            Image backgroundImage = new Image(getClass().getResourceAsStream("/Backgroundimg.jpg"));
+            BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+
             // BorderPane pääroska minkä sisällä kaikki muu
             BorderPane root = new BorderPane();
-            root.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+            root.setBackground(new Background(background));
             root.setPadding(new Insets(15, 1, 15, 1)); // margins top, right, bottom, left
 
             VBox labelBox = new VBox();
@@ -166,7 +171,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             GridPane grid = new GridPane();
             grid.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
             grid.setAlignment(Pos.TOP_LEFT);
-            grid.setVgap(10);
+            grid.setOpacity(0.8);
+            grid.setVgap(20);
             grid.setHgap(5);
 
             grid.add(aikaLabel, 0, 0);   // sarake, rivi
@@ -187,7 +193,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
             labelBox.getChildren().add(grid);
 
-            naytto = new Visualisointi(400, 200);
+            naytto = new Visualisointi(309, 200);
 
             // Canvas skaalaus ei toimi vielä kunnolla !!
             Canvas canvas = (Canvas) naytto;
@@ -202,6 +208,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             buttonBox.setPadding(new Insets(15, 12, 15, 12)); // margins top, right, bottom, left
             buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton, jatkaButton, pysaytaButton);
             buttonBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+            buttonBox.setOpacity(0.8);
 
             // BorderPanen asettelu
             root.setLeft(labelBox);
