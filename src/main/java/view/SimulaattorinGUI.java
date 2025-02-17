@@ -195,7 +195,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             canvas.heightProperty().bind(root.heightProperty().subtract(70)); // Adjusted height binding
 
 
-            // HBox näppäimille
+            // HBox painikkeille
             HBox buttonBox = new HBox();
             buttonBox.setAlignment(Pos.BOTTOM_CENTER);
             buttonBox.setSpacing(10); // spacing between buttons
@@ -237,6 +237,21 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         this.tulos.setText(formatter.format(aika));
     }
 
+    @Override
+    public void setLoppuaikaNuori(double aika) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.tulosIkaNuori.setText(formatter.format(aika));
+    }
+    @Override
+    public void setLoppuaikaKeski(double aika) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.tulosIkaKeski.setText(formatter.format(aika));
+    }
+    @Override
+    public void setLoppuaikaVanha(double aika) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.tulosIkaVanha.setText(formatter.format(aika));
+    }
 
 
 

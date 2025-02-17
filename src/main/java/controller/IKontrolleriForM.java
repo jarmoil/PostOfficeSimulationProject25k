@@ -8,5 +8,10 @@ public interface IKontrolleriForM {
 
     public void naytaLoppuaika(double aika);
     public void visualisoiAsiakas();
-    // public void visualisoiPalvelupiste();
+    public void naytaLoppuaikaNuori(double aika);
+    public void naytaLoppuaikaKeski(double aika);
+    public void naytaLoppuaikaVanha(double aika);
+
+
+    //public void visualisoiPalvelupiste();
 }

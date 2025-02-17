@@ -32,10 +32,10 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         j = this.getHeight() / 2;
         if (i==0) j+=10;
     }
-    public void uusiPalvelupiste(int x, int y) {
+    /*public void uusiPalvelupiste(int x, int y) {
         gc.setFill(Color.BROWN);
         gc.fillRect(i,j,40,20);
         i = x;
         j = y;
-    }
+    }*/
 }

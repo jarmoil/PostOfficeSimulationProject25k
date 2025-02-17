@@ -45,6 +45,20 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     public void naytaLoppuaika(double aika) {
         Platform.runLater(()->ui.setLoppuaika(aika));
     }
+    @Override
+    public void naytaLoppuaikaNuori(double aika) {
+        Platform.runLater(()->ui.setLoppuaikaNuori(aika));
+    }
+    @Override
+    public void naytaLoppuaikaKeski(double aika) {
+        Platform.runLater(()->ui.setLoppuaikaKeski(aika));
+    }
+    @Override
+    public void naytaLoppuaikaVanha(double aika) {
+        Platform.runLater(()->ui.setLoppuaikaVanha(aika));
+    }
+
+
 
 
     @Override
@@ -56,11 +70,10 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
         });
     }
 
-    /*@Override
-    public void visualisoiPalvelupiste() {
+    /*public void visualisoiPalvelupiste() {
         Platform.runLater(new Runnable(){
             public void run(){
-                ui.getVisualisointi().uusiPalvelupiste();
+                ui.getVisualisointi().uusiPalvelupiste(100, 200);
             }
         });
     }*/

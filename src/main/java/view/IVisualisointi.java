@@ -7,6 +7,6 @@ public interface IVisualisointi {
 
     public void uusiAsiakas();
 
-    // public void uusiPalvelupiste();
+    //public void uusiPalvelupiste(int x, int y);
 }
 
