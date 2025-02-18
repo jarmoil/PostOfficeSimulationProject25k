@@ -313,37 +313,37 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
 
             ETpalvelunValintaLabel = new Label("ERITYISTAPAUKSET: ");
-            ETpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            ETpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             ETpalvelunValintaLabel.setPrefWidth(150);
 
             ETjonossaLabel = new Label("Jonossa: ");
-            ETjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETjonossa = new Label();
-            ETjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETjonossa.setPrefWidth(150);
 
             ETpalveluMaaraLabel = new Label("Palveltu: ");
-            ETpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETpalveluMaara = new Label();
-            ETpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETpalveluMaara.setPrefWidth(150);
 
             ETkeskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
-            ETkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETkeskimJonoAika = new Label();
-            ETkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETkeskimJonoAika.setPrefWidth(150);
 
             ETkeskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
-            ETkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETkeskimPalveluAika = new Label();
-            ETkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETkeskimPalveluAika.setPrefWidth(150);
 
             ETkokonaisAikaLabel = new Label("Kokonaisaika: ");
-            ETkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETkokonaisAika = new Label();
-            ETkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             ETkokonaisAika.setPrefWidth(150);
 
 
