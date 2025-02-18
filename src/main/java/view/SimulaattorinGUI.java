@@ -156,158 +156,158 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             //pysaytaButton.setOnAction(e -> kontrolleri.pysayta());
 
             aikaLabel = new Label("Simulointiaika:");
-            aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
+            aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             aika = new TextField("Syötä aika");
-            aika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
+            aika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             aika.setPrefWidth(150);
 
             viiveLabel = new Label("Viive:");
-            viiveLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
+            viiveLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             viive = new TextField("Syötä viive");
-            viive.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
+            viive.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             viive.setPrefWidth(150);
 
             tulosLabel = new Label("Kokonaisaika:");
-            tulosLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            tulosLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulos = new Label();
-            tulos.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            tulos.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulos.setPrefWidth(150);
 
             ikaKeskPalveluaika = new Label("Keskim. palveluaika iän mukaan:");
-            ikaKeskPalveluaika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            ikaKeskPalveluaika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             ikaKeskPalveluaika.setPrefWidth(150);
 
             ikaNuori = new Label("18 - 40v: ");
-            ikaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ikaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulosIkaNuori = new Label();
-            tulosIkaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            tulosIkaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulosIkaNuori.setPrefWidth(150);
 
             ikaKeski = new Label("41 - 60v: ");
-            ikaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ikaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulosIkaKeski = new Label();
-            tulosIkaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            tulosIkaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulosIkaKeski.setPrefWidth(150);
 
             ikaVanha = new Label("61v +: ");
-            ikaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ikaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulosIkaVanha = new Label();
-            tulosIkaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            tulosIkaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             tulosIkaVanha.setPrefWidth(150);
 
 
             palvellutLabel = new Label("Palveltu: ");
-            palvellutLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            palvellutLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             palvellutAsiakasMaara = new Label();
-            palvellutAsiakasMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            palvellutAsiakasMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             palvellutAsiakasMaara.setPrefWidth(150);
 
 
 
             palvelunValintaLabel = new Label("PAKETTIAUTOMAATTI:");
-            palvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            palvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             palvelunValintaLabel.setPrefWidth(150);
 
             jonossaLabel = new Label("Jonossa: ");
-            jonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            jonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             jonossa = new Label();
-            jonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            jonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             jonossa.setPrefWidth(150);
 
             palveluMaaraLabel = new Label("Palveltu: ");
-            palveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            palveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             palveluMaara = new Label();
-            palveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            palveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             palveluMaara.setPrefWidth(150);
 
             keskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
-            keskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             keskimJonoAika = new Label();
-            keskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             keskimJonoAika.setPrefWidth(150);
 
             keskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
-            keskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             keskimPalveluAika = new Label();
-            keskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             keskimPalveluAika.setPrefWidth(150);
 
             kokonaisAikaLabel = new Label("Kokonaisaika: ");
-            kokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            kokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             kokonaisAika = new Label();
-            kokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            kokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             kokonaisAika.setPrefWidth(150);
 
 
 
             PVpalvelunValintaLabel = new Label("PALVELUNVALINTA: ");
-            PVpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            PVpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             PVpalvelunValintaLabel.setPrefWidth(150);
 
             PVjonossaLabel = new Label("Jonossa: ");
-            PVjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVjonossa = new Label();
-            PVjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVjonossa.setPrefWidth(150);
 
             PVpalveluMaaraLabel = new Label("Palveltu: ");
-            PVpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVpalveluMaara = new Label();
-            PVpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVpalveluMaara.setPrefWidth(150);
 
             PVkeskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
-            PVkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVkeskimJonoAika = new Label();
-            PVkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVkeskimJonoAika.setPrefWidth(150);
 
             PVkeskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
-            PVkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVkeskimPalveluAika = new Label();
-            PVkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVkeskimPalveluAika.setPrefWidth(150);
 
             PVkokonaisAikaLabel = new Label("Kokonaisaika: ");
-            PVkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVkokonaisAika = new Label();
-            PVkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             PVkokonaisAika.setPrefWidth(150);
 
 
 
             NTpalvelunValintaLabel = new Label("NOUTOLÄHETÄ: ");
-            NTpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            NTpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             NTpalvelunValintaLabel.setPrefWidth(150);
 
             NTjonossaLabel = new Label("Jonossa: ");
-            NTjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTjonossa = new Label();
-            NTjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTjonossa.setPrefWidth(150);
 
             NTpalveluMaaraLabel = new Label("Palveltu: ");
-            NTpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTpalveluMaara = new Label();
-            NTpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTpalveluMaara.setPrefWidth(150);
 
             NTkeskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
-            NTkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTkeskimJonoAika = new Label();
-            NTkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTkeskimJonoAika.setPrefWidth(150);
 
             NTkeskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
-            NTkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTkeskimPalveluAika = new Label();
-            NTkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTkeskimPalveluAika.setPrefWidth(150);
 
             NTkokonaisAikaLabel = new Label("Kokonaisaika: ");
-            NTkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTkokonaisAika = new Label();
-            NTkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
             NTkokonaisAika.setPrefWidth(150);
 
 
