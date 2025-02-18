@@ -378,7 +378,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             column2.setPercentWidth(50);
 
             // Horizontal alignment
-            grid.setGridLinesVisible(true);
+            //grid.setGridLinesVisible(true);
 
             grid.add(aikaLabel, 0, 0);   // sarake, rivi
             grid.add(aika, 1, 0);
