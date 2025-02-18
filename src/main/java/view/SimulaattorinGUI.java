@@ -44,6 +44,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private Label tulosIkaNuori;
     private Label tulosIkaKeski;
     private Label tulosIkaVanha;
+
     private Label palvelunValintaLabel;
     private Label jonossaLabel;
     private Label jonossa;
@@ -56,6 +57,41 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private Label kokonaisAikaLabel;
     private Label kokonaisAika;
 
+    private Label PVpalvelunValintaLabel;
+    private Label PVjonossaLabel;
+    private Label PVjonossa;
+    private Label PVpalveluMaaraLabel;
+    private Label PVpalveluMaara;
+    private Label PVkeskimJonoAikaLabel;
+    private Label PVkeskimJonoAika;
+    private Label PVkeskimPalveluAikaLabel;
+    private Label PVkeskimPalveluAika;
+    private Label PVkokonaisAikaLabel;
+    private Label PVkokonaisAika;
+
+    private Label NTpalvelunValintaLabel;
+    private Label NTjonossaLabel;
+    private Label NTjonossa;
+    private Label NTpalveluMaaraLabel;
+    private Label NTpalveluMaara;
+    private Label NTkeskimJonoAikaLabel;
+    private Label NTkeskimJonoAika;
+    private Label NTkeskimPalveluAikaLabel;
+    private Label NTkeskimPalveluAika;
+    private Label NTkokonaisAikaLabel;
+    private Label NTkokonaisAika;
+
+    private Label ETpalvelunValintaLabel;
+    private Label ETjonossaLabel;
+    private Label ETjonossa;
+    private Label ETpalveluMaaraLabel;
+    private Label ETpalveluMaara;
+    private Label ETkeskimJonoAikaLabel;
+    private Label ETkeskimJonoAika;
+    private Label ETkeskimPalveluAikaLabel;
+    private Label ETkeskimPalveluAika;
+    private Label ETkokonaisAikaLabel;
+    private Label ETkokonaisAika;
 
     private Button kaynnistaButton;
     private Button hidastaButton;
@@ -166,6 +202,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             palvellutAsiakasMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             palvellutAsiakasMaara.setPrefWidth(150);
 
+
+
             palvelunValintaLabel = new Label("PAKETTIAUTOMAATTI:");
             palvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
             palvelunValintaLabel.setPrefWidth(150);
@@ -201,6 +239,112 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             kokonaisAika.setPrefWidth(150);
 
 
+
+            PVpalvelunValintaLabel = new Label("PALVELUNVALINTA: ");
+            PVpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            PVpalvelunValintaLabel.setPrefWidth(150);
+
+            PVjonossaLabel = new Label("Jonossa: ");
+            PVjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVjonossa = new Label();
+            PVjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVjonossa.setPrefWidth(150);
+
+            PVpalveluMaaraLabel = new Label("Palveltu: ");
+            PVpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVpalveluMaara = new Label();
+            PVpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVpalveluMaara.setPrefWidth(150);
+
+            PVkeskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
+            PVkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimJonoAika = new Label();
+            PVkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimJonoAika.setPrefWidth(150);
+
+            PVkeskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
+            PVkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimPalveluAika = new Label();
+            PVkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkeskimPalveluAika.setPrefWidth(150);
+
+            PVkokonaisAikaLabel = new Label("Kokonaisaika: ");
+            PVkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkokonaisAika = new Label();
+            PVkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            PVkokonaisAika.setPrefWidth(150);
+
+
+
+            NTpalvelunValintaLabel = new Label("NOUTOLÄHETÄ: ");
+            NTpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            NTpalvelunValintaLabel.setPrefWidth(150);
+
+            NTjonossaLabel = new Label("Jonossa: ");
+            NTjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTjonossa = new Label();
+            NTjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTjonossa.setPrefWidth(150);
+
+            NTpalveluMaaraLabel = new Label("Palveltu: ");
+            NTpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTpalveluMaara = new Label();
+            NTpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTpalveluMaara.setPrefWidth(150);
+
+            NTkeskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
+            NTkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimJonoAika = new Label();
+            NTkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimJonoAika.setPrefWidth(150);
+
+            NTkeskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
+            NTkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimPalveluAika = new Label();
+            NTkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkeskimPalveluAika.setPrefWidth(150);
+
+            NTkokonaisAikaLabel = new Label("Kokonaisaika: ");
+            NTkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkokonaisAika = new Label();
+            NTkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            NTkokonaisAika.setPrefWidth(150);
+
+
+
+            ETpalvelunValintaLabel = new Label("ERITYISTAPAUKSET: ");
+            ETpalvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            ETpalvelunValintaLabel.setPrefWidth(150);
+
+            ETjonossaLabel = new Label("Jonossa: ");
+            ETjonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETjonossa = new Label();
+            ETjonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETjonossa.setPrefWidth(150);
+
+            ETpalveluMaaraLabel = new Label("Palveltu: ");
+            ETpalveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETpalveluMaara = new Label();
+            ETpalveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETpalveluMaara.setPrefWidth(150);
+
+            ETkeskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
+            ETkeskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimJonoAika = new Label();
+            ETkeskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimJonoAika.setPrefWidth(150);
+
+            ETkeskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
+            ETkeskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimPalveluAika = new Label();
+            ETkeskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkeskimPalveluAika.setPrefWidth(150);
+
+            ETkokonaisAikaLabel = new Label("Kokonaisaika: ");
+            ETkokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkokonaisAika = new Label();
+            ETkokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            ETkokonaisAika.setPrefWidth(150);
 
 
             // Pohjan luonti pitää vielä modifioida, aika maanantai malli atm.
@@ -244,6 +388,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             grid.add(tulos, 1, 2);
             grid.add(palvellutLabel, 0, 3);
             grid.add(palvellutAsiakasMaara, 1, 3);
+
             ikaKeskPalveluaika.setPrefWidth(300);
             grid.add(ikaKeskPalveluaika, 0, 4,2,1);
             grid.add(ikaNuori, 0, 5);
@@ -252,6 +397,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             grid.add(tulosIkaKeski, 1, 6);
             grid.add(ikaVanha, 0, 7);
             grid.add(tulosIkaVanha, 1, 7);
+
+            // PAKETTIAUTOMAATTI
             grid.add(palvelunValintaLabel,0,8,2,1);
             palvelunValintaLabel.setPrefWidth(300);
             grid.add(jonossaLabel,0,9);
@@ -264,6 +411,49 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             grid.add(keskimPalveluAika,1,12);
             grid.add(kokonaisAikaLabel,0,13);
             grid.add(kokonaisAika,1,13);
+
+            // PALVELUNVALINTA
+            grid.add(PVpalvelunValintaLabel,0,14,2,1);
+            PVpalvelunValintaLabel.setPrefWidth(300);
+            grid.add(PVjonossaLabel,0,15);
+            grid.add(PVjonossa,1,15);
+            grid.add(PVpalveluMaaraLabel,0,16);
+            grid.add(PVpalveluMaara,1,16);
+            grid.add(PVkeskimJonoAikaLabel,0,17);
+            grid.add(PVkeskimJonoAika,1,17);
+            grid.add(PVkeskimPalveluAikaLabel,0,18);
+            grid.add(PVkeskimPalveluAika,1,18);
+            grid.add(PVkokonaisAikaLabel,0,19);
+            grid.add(PVkokonaisAika,1,19);
+
+            // NOUTOLÄHETÄ
+            grid.add(NTpalvelunValintaLabel,0,20,2,1);
+            NTpalvelunValintaLabel.setPrefWidth(300);
+            grid.add(NTjonossaLabel,0,21);
+            grid.add(NTjonossa,1,21);
+            grid.add(NTpalveluMaaraLabel,0,22);
+            grid.add(NTpalveluMaara,1,22);
+            grid.add(NTkeskimJonoAikaLabel,0,23);
+            grid.add(NTkeskimJonoAika,1,23);
+            grid.add(NTkeskimPalveluAikaLabel,0,24);
+            grid.add(NTkeskimPalveluAika,1,24);
+            grid.add(NTkokonaisAikaLabel,0,25);
+            grid.add(NTkokonaisAika,1,25);
+
+            // ERITYISTAPAUKSET
+            grid.add(ETpalvelunValintaLabel,0,26,2,1);
+            ETpalvelunValintaLabel.setPrefWidth(300);
+            grid.add(ETjonossaLabel,0,27);
+            grid.add(ETjonossa,1,27);
+            grid.add(ETpalveluMaaraLabel,0,28);
+            grid.add(ETpalveluMaara,1,28);
+            grid.add(ETkeskimJonoAikaLabel,0,29);
+            grid.add(ETkeskimJonoAika,1,29);
+            grid.add(ETkeskimPalveluAikaLabel,0,30);
+            grid.add(ETkeskimPalveluAika,1,30);
+            grid.add(ETkokonaisAikaLabel,0,31);
+            grid.add(ETkokonaisAika,1,31);
+
 
             labelBox.getChildren().add(grid);
 
@@ -335,8 +525,109 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     }
 
     @Override
-    public void paivitaAsiakasMaara(int servedCustomers) {
-        this.palvellutAsiakasMaara.setText(Integer.toString(servedCustomers));
+    public void paivitaAsiakasMaara(int TotalServedCustomers) {
+        this.palvellutAsiakasMaara.setText(Integer.toString(TotalServedCustomers));
+    }
+
+    // PAKETTIAUTOMAATTI
+    @Override
+    public void paivitaJonoPituus(int queueLength) {
+        this.jonossa.setText(Integer.toString(queueLength));
+    }
+    @Override
+    public void paivitaPalveltuMaara(int servedCustomers) {
+        this.palveluMaara.setText(Integer.toString(servedCustomers));
+    }
+
+    @Override
+    public void paivitaKeskimJonoAika(double averageWaitingTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.keskimJonoAika.setText(formatter.format(averageWaitingTime));
+    }
+    @Override
+    public void paivitaKeskimPalveluAika(double averageServiceTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.keskimPalveluAika.setText(formatter.format(averageServiceTime));
+    }
+    @Override
+    public void paivitaKokonaisAika(double totalTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.kokonaisAika.setText(formatter.format(totalTime));
+    }
+
+    // PALVELUNVALINTA
+    @Override
+    public void PVpaivitaJonoPituus(int queueLength) {
+        this.PVjonossa.setText(Integer.toString(queueLength));
+    }
+    @Override
+    public void PVpaivitaPalveltuMaara(int servedCustomers) {
+        this.PVpalveluMaara.setText(Integer.toString(servedCustomers));
+    }
+    @Override
+    public void PVpaivitaKeskimJonoAika(double averageWaitingTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.PVkeskimJonoAika.setText(formatter.format(averageWaitingTime));
+    }
+    @Override
+    public void PVpaivitaKeskimPalveluAika(double averageServiceTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.PVkeskimPalveluAika.setText(formatter.format(averageServiceTime));
+    }
+    @Override
+    public void PVpaivitaKokonaisAika(double totalTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.PVkokonaisAika.setText(formatter.format(totalTime));
+    }
+
+    // NOUTOLÄHETÄ
+    @Override
+    public void NTpaivitaJonoPituus(int queueLength) {
+        this.NTjonossa.setText(Integer.toString(queueLength));
+    }
+    @Override
+    public void NTpaivitaPalveltuMaara(int servedCustomers) {
+        this.NTpalveluMaara.setText(Integer.toString(servedCustomers));
+    }
+    @Override
+    public void NTpaivitaKeskimJonoAika(double averageWaitingTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.NTkeskimJonoAika.setText(formatter.format(averageWaitingTime));
+    }
+    @Override
+    public void NTpaivitaKeskimPalveluAika(double averageServiceTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.NTkeskimPalveluAika.setText(formatter.format(averageServiceTime));
+    }
+    @Override
+    public void NTpaivitaKokonaisAika(double totalTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.NTkokonaisAika.setText(formatter.format(totalTime));
+    }
+
+    // ERITYISTAPAUKSET
+    @Override
+    public void ETpaivitaJonoPituus(int queueLength) {
+        this.ETjonossa.setText(Integer.toString(queueLength));
+    }
+    @Override
+    public void ETpaivitaPalveltuMaara(int servedCustomers) {
+        this.ETpalveluMaara.setText(Integer.toString(servedCustomers));
+    }
+    @Override
+    public void ETpaivitaKeskimJonoAika(double averageWaitingTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.ETkeskimJonoAika.setText(formatter.format(averageWaitingTime));
+    }
+    @Override
+    public void ETpaivitaKeskimPalveluAika(double averageServiceTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.ETkeskimPalveluAika.setText(formatter.format(averageServiceTime));
+    }
+    @Override
+    public void ETpaivitaKokonaisAika(double totalTime) {
+        DecimalFormat formatter = new DecimalFormat("#0.00");
+        this.ETkokonaisAika.setText(formatter.format(totalTime));
     }
 
 

@@ -65,21 +65,41 @@ public class OmaMoottori extends Moottori {
 			case PAKETTIAUTOMAATTI:
 				a = palvelupisteet[0].otaJonosta();
 				processCustomer(a, palvelupisteet[0]);
+				kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
+				kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
+				kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
+				kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
+				kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
 				break;
 
 			case PALVELUNVALINTA:
 				a = palvelupisteet[1].otaJonosta();
 				redirectToService(a);
+				kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
+				kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
+				kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
+				kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
+				kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
 				break;
 
 			case NOUTOLAHETA:
 				a = palvelupisteet[2].otaJonosta();
 				processCustomer(a, palvelupisteet[2]);
+				kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
+				kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
+				kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
+				kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
+				kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
 				break;
 
 			case ERITYISTAPAUKSET:
 				a = palvelupisteet[3].otaJonosta();
 				processCustomer(a, palvelupisteet[3]);
+				kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
+				kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
+				kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
+				kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
+				kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
 				break;
 		}
 	}
@@ -119,7 +139,7 @@ public class OmaMoottori extends Moottori {
 		a.setPoistumisaika(Kello.getInstance().getAika());
 		updateServiceTimeStats(a);
 		servedCustomers++;
-		kontrolleri.updateServedCustomers(servedCustomers);
+		kontrolleri.updateTotalServedCustomers(servedCustomers);
 		System.out.println("Asiakas " + a.getId() + " valmis " + p.getType() + " palvelutiskiltä");
 		a.raportti();
 	}
