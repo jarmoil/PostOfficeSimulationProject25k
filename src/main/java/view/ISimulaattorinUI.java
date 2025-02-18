@@ -13,6 +13,8 @@ public interface ISimulaattorinUI {
     public void setLoppuaikaKeski(double aika);
     public void setLoppuaikaVanha(double aika);
 
+    public void paivitaAsiakasMaara(int servedCustomers);
+
     // Kontrolleri tarvitsee
     public IVisualisointi getVisualisointi();
 

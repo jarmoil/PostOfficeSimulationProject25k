@@ -44,6 +44,18 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private Label tulosIkaNuori;
     private Label tulosIkaKeski;
     private Label tulosIkaVanha;
+    private Label palvelunValintaLabel;
+    private Label jonossaLabel;
+    private Label jonossa;
+    private Label palveluMaaraLabel;
+    private Label palveluMaara;
+    private Label keskimJonoAikaLabel;
+    private Label keskimJonoAika;
+    private Label keskimPalveluAikaLabel;
+    private Label keskimPalveluAika;
+    private Label kokonaisAikaLabel;
+    private Label kokonaisAika;
+
 
     private Button kaynnistaButton;
     private Button hidastaButton;
@@ -108,51 +120,88 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             //pysaytaButton.setOnAction(e -> kontrolleri.pysayta());
 
             aikaLabel = new Label("Simulointiaika:");
-            aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
             aika = new TextField("Syötä aika");
-            aika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            aika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
             aika.setPrefWidth(150);
 
             viiveLabel = new Label("Viive:");
-            viiveLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            viiveLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
             viive = new TextField("Syötä viive");
-            viive.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            viive.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
             viive.setPrefWidth(150);
 
             tulosLabel = new Label("Kokonaisaika:");
-            tulosLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulos = new Label();
-            tulos.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulos.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulos.setPrefWidth(150);
 
             ikaKeskPalveluaika = new Label("Keskim. palveluaika iän mukaan:");
-            ikaKeskPalveluaika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            ikaKeskPalveluaika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
             ikaKeskPalveluaika.setPrefWidth(150);
 
             ikaNuori = new Label("18 - 40v: ");
-            ikaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            ikaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulosIkaNuori = new Label();
-            tulosIkaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaNuori.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulosIkaNuori.setPrefWidth(150);
 
             ikaKeski = new Label("41 - 60v: ");
-            ikaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            ikaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulosIkaKeski = new Label();
-            tulosIkaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaKeski.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulosIkaKeski.setPrefWidth(150);
 
             ikaVanha = new Label("61v +: ");
-            ikaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            ikaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulosIkaVanha = new Label();
-            tulosIkaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            tulosIkaVanha.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             tulosIkaVanha.setPrefWidth(150);
 
 
-            palvellutLabel = new Label("Asiakkaat: ");
-            palvellutLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            palvellutLabel = new Label("Palveltu: ");
+            palvellutLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             palvellutAsiakasMaara = new Label();
-            palvellutAsiakasMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            palvellutAsiakasMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
             palvellutAsiakasMaara.setPrefWidth(150);
+
+            palvelunValintaLabel = new Label("PAKETTIAUTOMAATTI:");
+            palvelunValintaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 18));
+            palvelunValintaLabel.setPrefWidth(150);
+
+            jonossaLabel = new Label("Jonossa: ");
+            jonossaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            jonossa = new Label();
+            jonossa.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            jonossa.setPrefWidth(150);
+
+            palveluMaaraLabel = new Label("Palveltu: ");
+            palveluMaaraLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            palveluMaara = new Label();
+            palveluMaara.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            palveluMaara.setPrefWidth(150);
+
+            keskimJonoAikaLabel = new Label("Keskim. jonotusaika: ");
+            keskimJonoAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimJonoAika = new Label();
+            keskimJonoAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimJonoAika.setPrefWidth(150);
+
+            keskimPalveluAikaLabel = new Label("Keskim. palveluaika: ");
+            keskimPalveluAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimPalveluAika = new Label();
+            keskimPalveluAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            keskimPalveluAika.setPrefWidth(150);
+
+            kokonaisAikaLabel = new Label("Kokonaisaika: ");
+            kokonaisAikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            kokonaisAika = new Label();
+            kokonaisAika.setFont(Font.font("Tahoma", FontWeight.NORMAL, 15));
+            kokonaisAika.setPrefWidth(150);
+
+
+
 
             // Pohjan luonti pitää vielä modifioida, aika maanantai malli atm.
 
@@ -203,6 +252,18 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             grid.add(tulosIkaKeski, 1, 6);
             grid.add(ikaVanha, 0, 7);
             grid.add(tulosIkaVanha, 1, 7);
+            grid.add(palvelunValintaLabel,0,8,2,1);
+            palvelunValintaLabel.setPrefWidth(300);
+            grid.add(jonossaLabel,0,9);
+            grid.add(jonossa,1,9);
+            grid.add(palveluMaaraLabel,0,10);
+            grid.add(palveluMaara,1,10);
+            grid.add(keskimJonoAikaLabel,0,11);
+            grid.add(keskimJonoAika,1,11);
+            grid.add(keskimPalveluAikaLabel,0,12);
+            grid.add(keskimPalveluAika,1,12);
+            grid.add(kokonaisAikaLabel,0,13);
+            grid.add(kokonaisAika,1,13);
 
             labelBox.getChildren().add(grid);
 
@@ -272,6 +333,13 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.tulosIkaVanha.setText(formatter.format(aika));
     }
+
+    @Override
+    public void paivitaAsiakasMaara(int servedCustomers) {
+        this.palvellutAsiakasMaara.setText(Integer.toString(servedCustomers));
+    }
+
+
 
 
 

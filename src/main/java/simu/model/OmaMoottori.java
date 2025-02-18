@@ -11,6 +11,7 @@ public class OmaMoottori extends Moottori {
 	private Saapumisprosessi saapumisprosessi;
 	private Palvelupiste[] palvelupisteet;
 	private Random random;
+	private int servedCustomers = 0;
 
 
 	// iän seuranta ja niiden jaottelu
@@ -117,6 +118,8 @@ public class OmaMoottori extends Moottori {
 	private void processCustomer(Asiakas a, Palvelupiste p) {
 		a.setPoistumisaika(Kello.getInstance().getAika());
 		updateServiceTimeStats(a);
+		servedCustomers++;
+		kontrolleri.updateServedCustomers(servedCustomers);
 		System.out.println("Asiakas " + a.getId() + " valmis " + p.getType() + " palvelutiskiltä");
 		a.raportti();
 	}
@@ -127,12 +130,15 @@ public class OmaMoottori extends Moottori {
 		if (a.getAge() <= 40) {
 			totalServiceTime18to40 += serviceTime;
 			count18to40++;
+			kontrolleri.naytaLoppuaikaNuori(count18to40 > 0 ? totalServiceTime18to40 / count18to40 : 0);
 		} else if (a.getAge() <= 60) {
 			totalServiceTime41to60 += serviceTime;
 			count41to60++;
+			kontrolleri.naytaLoppuaikaKeski(count41to60 > 0 ? totalServiceTime41to60 / count41to60 : 0);
 		} else {
 			totalServiceTime60Plus += serviceTime;
 			count60Plus++;
+			kontrolleri.naytaLoppuaikaVanha(count60Plus > 0 ? totalServiceTime60Plus / count60Plus : 0);
 		}
 	}
 
@@ -159,9 +165,7 @@ public class OmaMoottori extends Moottori {
 
 		// UUTTA graafista
 		kontrolleri.naytaLoppuaika(Kello.getInstance().getAika());
-		kontrolleri.naytaLoppuaikaNuori(count18to40 > 0 ? totalServiceTime18to40 / count18to40 : 0);
-		kontrolleri.naytaLoppuaikaKeski(count41to60 > 0 ? totalServiceTime41to60 / count41to60 : 0);
-		kontrolleri.naytaLoppuaikaVanha(count60Plus > 0 ? totalServiceTime60Plus / count60Plus : 0);
+
 	}
 
 	private void printServicePointStats(Palvelupiste p) {

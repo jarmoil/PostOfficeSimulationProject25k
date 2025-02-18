@@ -11,6 +11,7 @@ public interface IKontrolleriForM {
     public void naytaLoppuaikaNuori(double aika);
     public void naytaLoppuaikaKeski(double aika);
     public void naytaLoppuaikaVanha(double aika);
+    public void updateServedCustomers(int servedCustomers);
 
 
     //public void visualisoiPalvelupiste();
