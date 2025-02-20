@@ -524,11 +524,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         this.tulosIkaVanha.setText(formatter.format(aika));
     }
 
-    @Override
+/*    @Override
     public void paivitaAsiakasMaara(int TotalServedCustomers) {
         this.palvellutAsiakasMaara.setText(Integer.toString(TotalServedCustomers));
     }
-
+*/
     // PAKETTIAUTOMAATTI
     @Override
     public void paivitaJonoPituus(int queueLength) {

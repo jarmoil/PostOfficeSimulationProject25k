@@ -11,7 +11,7 @@ public interface IKontrolleriForM {
     public void naytaLoppuaikaNuori(double aika);
     public void naytaLoppuaikaKeski(double aika);
     public void naytaLoppuaikaVanha(double aika);
-    public void updateTotalServedCustomers(int TotalServedCustomers);
+//    public void updateTotalServedCustomers(int TotalServedCustomers);
 
     public void updateQueueLength(int queueLength);
     public void updateServedCustomers(int servedCustomers);

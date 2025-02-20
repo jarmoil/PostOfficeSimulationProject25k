@@ -57,8 +57,8 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     public void naytaLoppuaikaVanha(double aika) {
         Platform.runLater(()->ui.setLoppuaikaVanha(aika));
     }
-    @Override
-    public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
+//    @Override
+//    public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
 
     // PAKETTIAUTOMAATTI
     @Override

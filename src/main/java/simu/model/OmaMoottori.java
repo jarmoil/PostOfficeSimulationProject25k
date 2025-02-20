@@ -11,7 +11,7 @@ public class OmaMoottori extends Moottori {
 	private Saapumisprosessi saapumisprosessi;
 	private Palvelupiste[] palvelupisteet;
 	private Random random;
-	private int servedCustomers = 0;
+//	private int servedCustomers = 0;
 
 
 	// iän seuranta ja niiden jaottelu
@@ -138,8 +138,8 @@ public class OmaMoottori extends Moottori {
 	private void processCustomer(Asiakas a, Palvelupiste p) {
 		a.setPoistumisaika(Kello.getInstance().getAika());
 		updateServiceTimeStats(a);
-		servedCustomers++;
-		kontrolleri.updateTotalServedCustomers(servedCustomers);
+//		servedCustomers++;
+//		kontrolleri.updateTotalServedCustomers(servedCustomers);
 		System.out.println("Asiakas " + a.getId() + " valmis " + p.getType() + " palvelutiskiltä");
 		a.raportti();
 	}
