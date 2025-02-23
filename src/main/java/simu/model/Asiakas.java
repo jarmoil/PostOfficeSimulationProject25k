@@ -1,5 +1,6 @@
 package simu.model;
 
+import controller.Kontrolleri;
 import simu.framework.*;
 
 import java.util.Random;
@@ -15,8 +16,17 @@ public class Asiakas {
 	private static int age;
 	public static int palvellut = 0;
 
+	//Koordinaatit
+	private int x;
+	private int y;
+
+
 	public Asiakas(){
 		id = i++;
+
+		// Asetetaan aloitus koordinaatit, parempi ratkaisu myöhemmin
+		x = 350;
+		y = 100;
 
 		// Random ikä välillä 18 - 80
 		Random random = new Random();
@@ -24,12 +34,22 @@ public class Asiakas {
 
 		saapumisaika = Kello.getInstance().getAika();
 		Trace.out(Trace.Level.INFO, "Uusi asiakas nro " + id + " ikä " + age +" saapui klo "+saapumisaika);
+
+
 	}
 	public int getAge() {
 		return age;
 	}
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
 	}
 
 	public double getPoistumisaika() {
@@ -54,6 +74,7 @@ public class Asiakas {
 		return id;
 	}
 
+
 	public void raportti(){
 		palvellut++;
 		Trace.out(Trace.Level.INFO, "\nAsiakas "+id+ " valmis! ");
@@ -63,6 +84,8 @@ public class Asiakas {
 		sum += (poistumisaika-saapumisaika);
 		double keskiarvo = sum/id;
 		System.out.println("Asiakkaiden läpimenoaikojen keskiarvo tähän asti "+ keskiarvo);
+
+
 	}
 
 	public int getPalvellut() { return palvellut; }

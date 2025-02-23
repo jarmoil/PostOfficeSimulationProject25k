@@ -57,8 +57,8 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     public void naytaLoppuaikaVanha(double aika) {
         Platform.runLater(()->ui.setLoppuaikaVanha(aika));
     }
-//    @Override
-//    public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
+    @Override
+    public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
 
     // PAKETTIAUTOMAATTI
     @Override
@@ -109,14 +109,26 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     public void ETupdateTotalTime(double totalTime) {Platform.runLater(()->ui.ETpaivitaKokonaisAika(totalTime));}
 
 
+    // Animaatio hommelit
+
     @Override
-    public void visualisoiAsiakas() {
-        Platform.runLater(new Runnable(){
-            public void run(){
-                ui.getVisualisointi().uusiAsiakas();
-            }
-        });
+    public void drawCustomer(int id, double x, double y) {
+        Platform.runLater(() -> ui.drawCustomer(id, x, y));
     }
+
+    @Override
+    public void exitCustomer(int id, double toX, double toY) {
+        Platform.runLater(() -> ui.exitCustomer(id, toX, toY));
+    }
+
+    @Override
+    public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
+        Platform.runLater(() -> ui.moveCustomer(id, toX, toY, onFinished));
+    }
+
+
+
+
 
     /*public void visualisoiPalvelupiste() {
         Platform.runLater(new Runnable(){

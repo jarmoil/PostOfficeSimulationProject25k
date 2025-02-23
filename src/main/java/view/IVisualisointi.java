@@ -5,7 +5,7 @@ public interface IVisualisointi {
 
     public void tyhjennaNaytto();
 
-    public void uusiAsiakas();
+    // Taisin poistaa jotain shittiä täältä (t Orsto)
 
     //public void uusiPalvelupiste(int x, int y);
 }

@@ -29,14 +29,10 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         gc.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
-    public void uusiAsiakas() {
-        gc.setFill(Color.RED);
-        gc.fillOval(i,j,10,10);
-
-        i = (i + 10) % this.getWidth();
-        j = this.getHeight() / 2;
-        if (i==0) j+=10;
-    }
+    /*
+    Animaatio shitit on tällä hetkellä kaikki SimulaattorinGUI luokassa, ehkä voisi siirtää tänne?
+    Varmaan parempi sillein, mut sen voi tehä sit ku on aikaa.
+     */
 
     //jotenkin tällein, pitää varmaan jokaiselle palvelupisteelle
     // olla oma metodi et ne pystyy sijottamaan eri kohtiin, kai?
