@@ -38,6 +38,20 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
         moottori.setViive((long)(moottori.getViive()*0.9));
     }
 
+    @Override
+    public void jatka(){
+        if (moottori != null){
+            moottori.jatkaSimulaatio();
+        }
+    }
+
+    @Override
+    public void pysayta(){
+        if(moottori != null){
+            moottori.pysaytaSimulaatio();
+        }
+    }
+
     // Simulointitulosten välittämistä käyttöliittymään.
     // Koska FX-ui:n päivitykset tulevat moottorisäikeestä, ne pitää ohjata JavaFX-säikeeseen:
 

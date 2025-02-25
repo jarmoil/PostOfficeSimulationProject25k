@@ -5,6 +5,8 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M√
 	
 	private double simulointiaika = 0;
 	private long viive = 0;
+	private boolean paused = false;
+	private final Object lock = new Object();
 	
 	private Kello kello;
 	
@@ -42,6 +44,16 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M√
 		alustukset(); // luodaan mm. ensimm√§inen tapahtuma
 		while (simuloidaan()){
 			viive(); // UUSI
+
+			synchronized (lock){
+				while(paused){
+					try{
+						lock.wait();
+					}catch(InterruptedException e){
+						e.printStackTrace();
+					}
+				}
+			}
 			
 			Trace.out(Trace.Level.INFO, "\nA-vaihe: kello on " + nykyaika());
 			kello.setAika(nykyaika());
@@ -56,7 +68,20 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M√
 		tulokset();
 		
 	}
-	
+
+	public void pysaytaSimulaatio(){
+		synchronized (lock){
+			paused = true;
+		}
+	}
+
+	public void jatkaSimulaatio(){
+		synchronized (lock){
+			paused = false;
+			lock.notify();
+		}
+	}
+
 	private void suoritaBTapahtumat(){
 		while (tapahtumalista.getSeuraavanAika() == kello.getAika()){
 			suoritaTapahtuma(tapahtumalista.poista());

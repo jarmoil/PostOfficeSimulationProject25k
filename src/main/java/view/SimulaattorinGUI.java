@@ -160,13 +160,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
             jatkaButton = new Button();
             jatkaButton.setText("Jatka");
-            //Pitää tehdä sisältö tälle nappulalle
-            //jatkaButton.setOnAction(e -> kontrolleri.jatka());
+            jatkaButton.setOnAction(e -> kontrolleri.jatka());
 
             pysaytaButton = new Button();
             pysaytaButton.setText("Pysäytä");
-            //Pitää tehdä sisältö tälle nappulalle
-            //pysaytaButton.setOnAction(e -> kontrolleri.pysayta());
+            pysaytaButton.setOnAction(e -> kontrolleri.pysayta());
 
             aikaLabel = new Label("Simulointiaika:");
             aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
