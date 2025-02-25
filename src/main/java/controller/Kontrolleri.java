@@ -113,17 +113,17 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
 
     @Override
     public void drawCustomer(int id, double x, double y) {
-        Platform.runLater(() -> ui.drawCustomer(id, x, y));
+        Platform.runLater(() -> ui.getVisualisointi().drawCustomer(id, x, y));
     }
 
     @Override
     public void exitCustomer(int id, double toX, double toY) {
-        Platform.runLater(() -> ui.exitCustomer(id, toX, toY));
+        Platform.runLater(() -> ui.getVisualisointi().exitCustomer(id, toX, toY));
     }
 
     @Override
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
-        Platform.runLater(() -> ui.moveCustomer(id, toX, toY, onFinished));
+        Platform.runLater(() -> ui.getVisualisointi().moveCustomer(id, toX, toY, onFinished));
     }
 
 

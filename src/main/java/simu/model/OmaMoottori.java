@@ -75,52 +75,60 @@ public class OmaMoottori extends Moottori {
 				 noissa caseissa, niin koodi olis vähän siistimpää
 				 */
 
+			/*
+			Animaatioita muutettu niin, että ensin asiakas liikkuu palvelupisteeelle -> processCustomer ja muut hommat ->
+			Asiakas poistuu lopuksi
+			 */
+
 			case PAKETTIAUTOMAATTI:
 				a = palvelupisteet[0].otaJonosta();
-				processCustomer(a, palvelupisteet[0]);
-				kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
-				kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
-				kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
-				kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
-				kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
-				// Liikutetaan asiakas "pakettiautomaatille" ja kun valmis, poistetaan exitin kautta näytöltä
-				kontrolleri.moveCustomer(a.getId(), 1400, 100, () -> kontrolleri.exitCustomer(a.getId(), 1400, 650)); // UUSI
+				kontrolleri.moveCustomer(a.getId(), 1400, 100, () -> {
+					processCustomer(a, palvelupisteet[0]);
+					kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
+					kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
+					kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
+					kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
+					kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
+					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+				});
 				break;
 
 			case PALVELUNVALINTA:
 				a = palvelupisteet[1].otaJonosta();
-				redirectToService(a);
-				kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
-				kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
-				kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
-				kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
-				kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
-				// Liikutetaan asiakas "palvelunvalintaan" ja kun valmis, poistetaan exitin kautta näytöltä
-				kontrolleri.moveCustomer(a.getId(), 550, 250,  () -> {}); // UUSI
+				kontrolleri.moveCustomer(a.getId(), 550, 250,  () -> {
+					redirectToService(a);
+					kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
+					kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
+					kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
+					kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
+					kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
+				});
 				break;
 
 			case NOUTOLAHETA:
 				a = palvelupisteet[2].otaJonosta();
-				processCustomer(a, palvelupisteet[2]);
-				kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
-				kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
-				kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
-				kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
-				kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
-				// Liikutetaan asiakas "nouto/lähetä" palvelutiskille ja kun valmis, poistetaan exitin kautta näytöltä
-				kontrolleri.moveCustomer(a.getId(), 600, 350, () -> kontrolleri.exitCustomer(a.getId(), 1400, 650));
+				kontrolleri.moveCustomer(a.getId(), 600, 350, () -> {
+					processCustomer(a, palvelupisteet[2]);
+					kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
+					kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
+					kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
+					kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
+					kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
+					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+				});
 				break;
 
 			case ERITYISTAPAUKSET:
 				a = palvelupisteet[3].otaJonosta();
-				processCustomer(a, palvelupisteet[3]);
-				kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
-				kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
-				kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
-				kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
-				kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
-				// Liikutetaan asiakas "erityistapaus" palvelutiskille ja kun valmis, poistetaan exitin kautta näytöltä
-				kontrolleri.moveCustomer(a.getId(), 600, 700, () -> kontrolleri.exitCustomer(a.getId(), 1400, 650));
+				kontrolleri.moveCustomer(a.getId(), 600, 700, () -> {
+					processCustomer(a, palvelupisteet[3]);
+					kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
+					kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
+					kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
+					kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
+					kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
+					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+				});
 				break;
 		}
 	}

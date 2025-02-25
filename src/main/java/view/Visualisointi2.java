@@ -1,4 +1,4 @@
-package view;
+/* package view;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -41,4 +41,4 @@ public class Visualisointi2 extends Canvas implements IVisualisointi{
     }*/
 
 
-}
+
