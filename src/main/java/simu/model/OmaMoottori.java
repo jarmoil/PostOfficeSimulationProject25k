@@ -27,7 +27,6 @@ public class OmaMoottori extends Moottori {
 	private static final double PROBABILITY_41TO60 = 0.3;
 	private static final double PROBABILITY_60PLUS = 0.1;
 
-	// Koordinatteja palvepisteille (TESTAILUA)
 
 
 	public OmaMoottori(IKontrolleriForM kontrolleri) {

@@ -1,6 +1,5 @@
 package controller;
 
-import view.Visualisointi;
 
 public interface IKontrolleriForM {
 
