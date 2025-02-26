@@ -7,11 +7,10 @@ public interface IKontrolleriForM {
     // Rajapinta, joka tarjotaan moottorille:
 
     public void naytaLoppuaika(double aika);
-    public void visualisoiAsiakas();
     public void naytaLoppuaikaNuori(double aika);
     public void naytaLoppuaikaKeski(double aika);
     public void naytaLoppuaikaVanha(double aika);
-//    public void updateTotalServedCustomers(int TotalServedCustomers);
+    public void updateTotalServedCustomers(int TotalServedCustomers);
 
     public void updateQueueLength(int queueLength);
     public void updateServedCustomers(int servedCustomers);
@@ -36,6 +35,11 @@ public interface IKontrolleriForM {
     public void ETupdateAverageWaitingTime(double averageWaitingTime);
     public void ETupdateAverageSerciceTime(double averageServiceTime);
     public void ETupdateTotalTime(double totalTime);
+
+    // Animaatio huommelit
+    public void drawCustomer(int id, double x, double y);
+    public void exitCustomer(int id, double toX, double toY);
+    public void moveCustomer(int id, double toX, double toY, Runnable onFinished);
 
     //public void visualisoiPalvelupiste();
 }

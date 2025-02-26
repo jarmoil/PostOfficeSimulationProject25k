@@ -2,17 +2,27 @@ package view;
 
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import controller.*;
+import javafx.animation.FadeTransition;
+import javafx.animation.SequentialTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import simu.framework.Trace;
 import simu.framework.Trace.Level;
 import javafx.scene.*;
@@ -27,6 +37,22 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
     //Kontrollerin esittely (tarvitaan käyttöliittymässä)
     private IKontrolleriForV kontrolleri;
+    private int customerCount = 0;
+
+    // Heitin root borderpanen tänne, käytän sitä useammassa metodissa
+    private BorderPane root;
+
+    // Animaatio shittiä
+
+    // Lista varatuista sijainneista
+    private List<Point2D> occupiedPositions = new ArrayList<>();
+
+    // Asiakkaan koko, minimi välimatka kun luodaan asiakkaita, että ei mene päällekkäin jne.
+    private static final double CUSTOMER_RADIUS = 10;
+    private static final double MIN_DISTANCE = 3 * CUSTOMER_RADIUS;
+    private static final double areaWidth = 100;
+    private static final double areaHeight = 100;
+
 
     // Käyttöliittymäkomponentit:
     private TextField aika;
@@ -352,7 +378,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
             // BorderPane pääroska minkä sisällä kaikki muu
-            BorderPane root = new BorderPane();
+            root = new BorderPane();
             root.setBackground(new Background(background));
             root.setPadding(new Insets(4,1, 0, 1)); // margins top, right, bottom, left
 
@@ -522,11 +548,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         this.tulosIkaVanha.setText(formatter.format(aika));
     }
 
-/*    @Override
+    @Override
     public void paivitaAsiakasMaara(int TotalServedCustomers) {
         this.palvellutAsiakasMaara.setText(Integer.toString(TotalServedCustomers));
     }
-*/
+
     // PAKETTIAUTOMAATTI
     @Override
     public void paivitaJonoPituus(int queueLength) {
@@ -627,6 +653,80 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.ETkokonaisAika.setText(formatter.format(totalTime));
     }
+
+    // Animaatio hommelit, nää varmaa vois laittaa Visualisointi luokkaan ja muutenkin paremmin tehdä
+    // mutta nyt tällänen jonkinlaine ratkaisu. Tässä on siis asiakkaiden piirtäminen ja liikuttaminen
+
+    @Override
+    public void drawCustomer(int id, double areaX, double areaY) {
+        double x = areaX;
+        double y = areaY;
+
+        // Check for overlaps and adjust position if necessary
+        boolean overlap;
+        do {
+            overlap = false;
+            for (Point2D position : occupiedPositions) {
+                if (position.distance(x, y) < MIN_DISTANCE) {
+                    overlap = true;
+                    x += MIN_DISTANCE; // Adjust x position
+                    if (x > areaX + areaWidth - CUSTOMER_RADIUS) { // If x exceeds area width, reset x and adjust y
+                        x = areaX;
+                        y += MIN_DISTANCE;
+                    }
+                    if (y > areaY + areaHeight - CUSTOMER_RADIUS) { // If y exceeds area height, reset y
+                        y = areaY;
+                    }
+                    break;
+                }
+            }
+        } while (overlap);
+
+        // Add the new position to the list of occupied positions
+        occupiedPositions.add(new Point2D(x, y));
+
+        Circle customer = new Circle(CUSTOMER_RADIUS, Color.BLUE);
+        customer.setId("customer-" + id);
+        customer.setCenterX(x);
+        customer.setCenterY(y);
+        root.getChildren().add(customer);
+    }
+
+    @Override
+    public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
+        Circle customer = (Circle) root.lookup("#customer-" + id);
+        if (customer != null) {
+            Point2D oldPosition = new Point2D(customer.getCenterX(), customer.getCenterY());
+            occupiedPositions.remove(oldPosition);
+
+            TranslateTransition transition = new TranslateTransition(Duration.seconds(1), customer);
+            transition.setToX(toX - customer.getCenterX());
+            transition.setToY(toY - customer.getCenterY());
+            transition.setOnFinished(event -> onFinished.run());
+            transition.play();
+        }
+    }
+
+    @Override
+    public void exitCustomer(int id, double toX, double toY) {
+        Circle customer = (Circle) root.lookup("#customer-" + id);
+        if (customer != null) {
+            Point2D oldPosition = new Point2D(customer.getCenterX(), customer.getCenterY());
+            occupiedPositions.remove(oldPosition);
+
+            TranslateTransition transition = new TranslateTransition(Duration.seconds(1), customer);
+            transition.setToX(toX - customer.getCenterX());
+            transition.setToY(toY - customer.getCenterY());
+
+            FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), customer);
+            fadeTransition.setToValue(0);
+
+            SequentialTransition sequentialTransition = new SequentialTransition(transition, fadeTransition);
+            sequentialTransition.setOnFinished(event -> root.getChildren().remove(customer));
+            sequentialTransition.play();
+        }
+    }
+
 
 
 

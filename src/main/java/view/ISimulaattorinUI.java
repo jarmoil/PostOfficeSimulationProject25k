@@ -12,7 +12,7 @@ public interface ISimulaattorinUI {
     public void setLoppuaikaNuori(double aika);
     public void setLoppuaikaKeski(double aika);
     public void setLoppuaikaVanha(double aika);
-    //public void paivitaAsiakasMaara(int totalServedCustomers);
+    public void paivitaAsiakasMaara(int totalServedCustomers);
 
     // PAKETTIAUTOMAATTI
     public void paivitaJonoPituus(int queueLength);
@@ -46,4 +46,8 @@ public interface ISimulaattorinUI {
     // Kontrolleri tarvitsee
     public IVisualisointi getVisualisointi();
 
+    // Animaatio hommelit
+    public void drawCustomer(int id, double x, double y);
+    public void exitCustomer(int id, double toX, double toY);
+    public void moveCustomer(int id, double toX, double toY, Runnable onFinished);
 }
