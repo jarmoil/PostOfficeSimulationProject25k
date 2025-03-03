@@ -1,5 +1,6 @@
 package simu.framework;
 import controller.IKontrolleriForM; // UUSI
+import javafx.application.Platform;
 
 public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÄÄRITYKSET
 	
@@ -82,6 +83,24 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 		}
 	}
 
+	public void set(){
+		synchronized (lock){
+			double targetTime = kello.getAika() + 0.5;
+
+			while (kello.getAika() < targetTime && simuloidaan()){
+				double seuraavanAika = tapahtumalista.getSeuraavanAika();
+
+				if (seuraavanAika > kello.getAika() && seuraavanAika <= targetTime){
+					kello.setAika(seuraavanAika);
+					suoritaBTapahtumat();
+					yritaCTapahtumat();
+				} else {
+					kello.setAika(targetTime);
+				}
+			}
+		}
+	}
+
 	private void suoritaBTapahtumat(){
 		while (tapahtumalista.getSeuraavanAika() == kello.getAika()){
 			suoritaTapahtuma(tapahtumalista.poista());
@@ -111,5 +130,5 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 	protected abstract void alustukset(); // Määritellään simu.model-pakkauksessa Moottorin aliluokassa
 
 	protected abstract void tulokset(); // Määritellään simu.model-pakkauksessa Moottorin aliluokassa
-	
+
 }

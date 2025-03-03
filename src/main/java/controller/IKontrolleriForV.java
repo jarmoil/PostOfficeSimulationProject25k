@@ -9,4 +9,5 @@ public interface IKontrolleriForV {
     public void hidasta();
     public void jatka();
     public void pysayta();
+    void set();
 }
