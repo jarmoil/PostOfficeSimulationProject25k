@@ -1,6 +1,5 @@
 package simu.model;
 
-import controller.Kontrolleri;
 import simu.framework.*;
 
 import java.util.Random;

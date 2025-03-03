@@ -45,9 +45,4 @@ public interface ISimulaattorinUI {
 
     // Kontrolleri tarvitsee
     public IVisualisointi getVisualisointi();
-
-    // Animaatio hommelit
-    public void drawCustomer(int id, double x, double y);
-    public void exitCustomer(int id, double toX, double toY);
-    public void moveCustomer(int id, double toX, double toY, Runnable onFinished);
 }
