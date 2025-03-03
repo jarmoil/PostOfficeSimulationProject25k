@@ -83,11 +83,7 @@ public class OmaMoottori extends Moottori {
 				a = palvelupisteet[0].otaJonosta();
 				kontrolleri.moveCustomer(a.getId(), 1400, 100, () -> {
 					processCustomer(a, palvelupisteet[0]);
-					kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
-					kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
-					kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
-					kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
-					kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
+					updatePakettiautomaatti();
 					kontrolleri.exitCustomer(a.getId(), 1400, 650);
 				});
 				break;
@@ -96,11 +92,7 @@ public class OmaMoottori extends Moottori {
 				a = palvelupisteet[1].otaJonosta();
 				kontrolleri.moveCustomer(a.getId(), 550, 250,  () -> {
 					redirectToService(a);
-					kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
-					kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
-					kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
-					kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
-					kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
+					updatePalvelunvalinta();
 				});
 				break;
 
@@ -108,11 +100,7 @@ public class OmaMoottori extends Moottori {
 				a = palvelupisteet[2].otaJonosta();
 				kontrolleri.moveCustomer(a.getId(), 600, 350, () -> {
 					processCustomer(a, palvelupisteet[2]);
-					kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
-					kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
-					kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
-					kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
-					kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
+					updateNoutolaheta();
 					kontrolleri.exitCustomer(a.getId(), 1400, 650);
 				});
 				break;
@@ -121,11 +109,7 @@ public class OmaMoottori extends Moottori {
 				a = palvelupisteet[3].otaJonosta();
 				kontrolleri.moveCustomer(a.getId(), 600, 700, () -> {
 					processCustomer(a, palvelupisteet[3]);
-					kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
-					kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
-					kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
-					kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
-					kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
+					updateErikoistapaus();
 					kontrolleri.exitCustomer(a.getId(), 1400, 650);
 				});
 				break;
@@ -188,6 +172,34 @@ public class OmaMoottori extends Moottori {
 			count60Plus++;
 			kontrolleri.naytaLoppuaikaVanha(count60Plus > 0 ? totalServiceTime60Plus / count60Plus : 0);
 		}
+	}
+	private void updatePakettiautomaatti() {
+		kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
+		kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
+		kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
+		kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
+		kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
+	}
+	private void updatePalvelunvalinta() {
+		kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
+		kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
+		kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
+		kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
+		kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
+	}
+	private void updateNoutolaheta() {
+		kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
+		kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
+		kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
+		kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
+		kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
+	}
+	private void updateErikoistapaus() {
+		kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
+		kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
+		kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
+		kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
+		kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
 	}
 
 	@Override
