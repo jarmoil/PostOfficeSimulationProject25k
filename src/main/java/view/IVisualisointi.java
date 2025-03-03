@@ -5,7 +5,11 @@ public interface IVisualisointi {
 
     public void tyhjennaNaytto();
 
-    public void uusiAsiakas();
+    // Animaatio hommelit
+    public void drawCustomer(int id, double x, double y);
+    public void exitCustomer(int id, double toX, double toY);
+    public void moveCustomer(int id, double toX, double toY, Runnable onFinished);
+
 
     //public void uusiPalvelupiste(int x, int y);
 }

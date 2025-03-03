@@ -2,7 +2,10 @@ package view;
 
 
 import java.text.DecimalFormat;
+
+
 import controller.*;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -27,6 +30,9 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
     //Kontrollerin esittely (tarvitaan käyttöliittymässä)
     private IKontrolleriForV kontrolleri;
+
+    // Heitin root borderpanen tänne, käytän sitä useammassa metodissa
+    private BorderPane root;
 
     // Käyttöliittymäkomponentit:
     private TextField aika;
@@ -352,7 +358,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             BackgroundImage background = new BackgroundImage(backgroundImage, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
 
             // BorderPane pääroska minkä sisällä kaikki muu
-            BorderPane root = new BorderPane();
+            root = new BorderPane();
             root.setBackground(new Background(background));
             root.setPadding(new Insets(4,1, 0, 1)); // margins top, right, bottom, left
 
@@ -455,7 +461,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
             labelBox.getChildren().add(grid);
 
-            naytto = new Visualisointi(309, 200);
+            naytto = new Visualisointi(309, 200, root);
 
             // Canvas skaalaus ei toimi vielä kunnolla !!
             Canvas canvas = (Canvas) naytto;
@@ -522,11 +528,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         this.tulosIkaVanha.setText(formatter.format(aika));
     }
 
-/*    @Override
+    @Override
     public void paivitaAsiakasMaara(int TotalServedCustomers) {
         this.palvellutAsiakasMaara.setText(Integer.toString(TotalServedCustomers));
     }
-*/
+
     // PAKETTIAUTOMAATTI
     @Override
     public void paivitaJonoPituus(int queueLength) {
@@ -627,10 +633,6 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.ETkokonaisAika.setText(formatter.format(totalTime));
     }
-
-
-
-
 
     @Override
     public IVisualisointi getVisualisointi() {

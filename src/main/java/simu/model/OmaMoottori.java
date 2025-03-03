@@ -11,7 +11,7 @@ public class OmaMoottori extends Moottori {
 	private Saapumisprosessi saapumisprosessi;
 	private Palvelupiste[] palvelupisteet;
 	private Random random;
-//	private int servedCustomers = 0;
+	private int servedCustomers = 0;
 
 
 	// iän seuranta ja niiden jaottelu
@@ -26,6 +26,8 @@ public class OmaMoottori extends Moottori {
 	private static final double PROBABILITY_18TO40 = 0.7;
 	private static final double PROBABILITY_41TO60 = 0.3;
 	private static final double PROBABILITY_60PLUS = 0.1;
+
+
 
 	public OmaMoottori(IKontrolleriForM kontrolleri) {
 		super (kontrolleri);
@@ -59,47 +61,73 @@ public class OmaMoottori extends Moottori {
 				a = new Asiakas();
 				handleArrival(a);
 				saapumisprosessi.generoiSeuraava();
-				kontrolleri.visualisoiAsiakas(); // UUSI
+
+				/* Piirretään asiakas näytölle, voisi olla joku fadein animaatio tai vaikkapa liike
+				   vähän niin kuin ruudun ulkopuolelta tuleva asiakas (saapuu palvelupisteelle)
+				 */
+				kontrolleri.drawCustomer(a.getId(), a.getX(), a.getY()); // UUSI
+
 				break;
+
+				/*
+				kaikki noi kontrolleri.updateQueueLength yms yms vois laittaa yhteen metodiin ja kutsua sitä
+				 noissa caseissa, niin koodi olis vähän siistimpää
+				 */
+
+			/*
+			Animaatioita muutettu niin, että ensin asiakas liikkuu palvelupisteeelle -> processCustomer ja muut hommat ->
+			Asiakas poistuu lopuksi
+			 */
 
 			case PAKETTIAUTOMAATTI:
 				a = palvelupisteet[0].otaJonosta();
-				processCustomer(a, palvelupisteet[0]);
-				kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
-				kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
-				kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
-				kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
-				kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
+				kontrolleri.moveCustomer(a.getId(), 1400, 100, () -> {
+					processCustomer(a, palvelupisteet[0]);
+					kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
+					kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
+					kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
+					kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
+					kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
+					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+				});
 				break;
 
 			case PALVELUNVALINTA:
 				a = palvelupisteet[1].otaJonosta();
-				redirectToService(a);
-				kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
-				kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
-				kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
-				kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
-				kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
+				kontrolleri.moveCustomer(a.getId(), 550, 250,  () -> {
+					redirectToService(a);
+					kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
+					kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
+					kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
+					kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
+					kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
+				});
 				break;
 
 			case NOUTOLAHETA:
 				a = palvelupisteet[2].otaJonosta();
-				processCustomer(a, palvelupisteet[2]);
-				kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
-				kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
-				kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
-				kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
-				kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
+				kontrolleri.moveCustomer(a.getId(), 600, 350, () -> {
+					processCustomer(a, palvelupisteet[2]);
+					kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
+					kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
+					kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
+					kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
+					kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
+					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+				});
 				break;
 
 			case ERITYISTAPAUKSET:
 				a = palvelupisteet[3].otaJonosta();
-				processCustomer(a, palvelupisteet[3]);
-				kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
-				kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
-				kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
-				kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
-				kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
+				kontrolleri.moveCustomer(a.getId(), 600, 700, () -> {
+					processCustomer(a, palvelupisteet[3]);
+					kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
+					kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
+					kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
+					kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
+					kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
+					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+				});
 				break;
 		}
 	}
@@ -138,8 +166,8 @@ public class OmaMoottori extends Moottori {
 	private void processCustomer(Asiakas a, Palvelupiste p) {
 		a.setPoistumisaika(Kello.getInstance().getAika());
 		updateServiceTimeStats(a);
-//		servedCustomers++;
-//		kontrolleri.updateTotalServedCustomers(servedCustomers);
+		servedCustomers++;
+	    kontrolleri.updateTotalServedCustomers(servedCustomers);
 		System.out.println("Asiakas " + a.getId() + " valmis " + p.getType() + " palvelutiskiltä");
 		a.raportti();
 	}
