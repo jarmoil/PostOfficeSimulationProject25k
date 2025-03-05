@@ -1,6 +1,8 @@
 package simu.model;
 
 import controller.IKontrolleriForM;
+import dao.TuloksetDao;
+import entity.*;
 import simu.framework.*;
 import eduni.distributions.Negexp;
 import eduni.distributions.Normal;
@@ -13,6 +15,32 @@ public class OmaMoottori extends Moottori {
 	private Random random;
 	private int servedCustomers = 0;
 
+	private IDao tuloksetDao;
+	private Tulokset tulokset;
+
+	private record ServicePoint(double x, double y, double exitX, double exitY) {}
+
+	private ServicePoint getServiceConfig(TapahtumanTyyppi type) {
+		return switch (type) {
+			case PAKETTIAUTOMAATTI -> new ServicePoint(1400, 100, 1400, 650);
+			case PALVELUNVALINTA -> new ServicePoint(550, 250, 550, 250);
+			case NOUTOLAHETA -> new ServicePoint(600, 350, 1400, 650);
+			case ERITYISTAPAUKSET -> new ServicePoint(600, 700, 1400, 650);
+			case ARR1 -> throw new IllegalArgumentException("Invalid service point type");
+		};
+	}
+
+	private void updateStats(Palvelupiste p) {
+
+		kontrolleri.updateServicePointStats(
+				p.getType(),
+				p.getQueueLength(),
+				p.getServedCustomers(),
+				p.getAverageWaitingTime(),
+				p.getAverageServiceTime(),
+				p.getTotalTime()
+		);
+	}
 
 	// iän seuranta ja niiden jaottelu
 	private double totalServiceTime18to40 = 0;
@@ -32,6 +60,7 @@ public class OmaMoottori extends Moottori {
 	public OmaMoottori(IKontrolleriForM kontrolleri) {
 		super (kontrolleri);
 
+		tuloksetDao = new TuloksetDao();
 		palvelupisteet = new Palvelupiste[4];
 
 		// Initialize service points
@@ -56,79 +85,35 @@ public class OmaMoottori extends Moottori {
 	@Override
 	protected void suoritaTapahtuma(Tapahtuma t) {
 		Asiakas a;
-		switch ((TapahtumanTyyppi) t.getTyyppi()) {
-			case ARR1:
+		TapahtumanTyyppi type = (TapahtumanTyyppi) t.getTyyppi();
+
+		switch (type) {
+			case ARR1 -> {
 				a = new Asiakas();
 				handleArrival(a);
 				saapumisprosessi.generoiSeuraava();
-
-				/* Piirretään asiakas näytölle, voisi olla joku fadein animaatio tai vaikkapa liike
-				   vähän niin kuin ruudun ulkopuolelta tuleva asiakas (saapuu palvelupisteelle)
-				 */
-				kontrolleri.drawCustomer(a.getId(), a.getX(), a.getY()); // UUSI
-
-				break;
-
-				/*
-				kaikki noi kontrolleri.updateQueueLength yms yms vois laittaa yhteen metodiin ja kutsua sitä
-				 noissa caseissa, niin koodi olis vähän siistimpää
-				 */
-
-			/*
-			Animaatioita muutettu niin, että ensin asiakas liikkuu palvelupisteeelle -> processCustomer ja muut hommat ->
-			Asiakas poistuu lopuksi
-			 */
-
-			case PAKETTIAUTOMAATTI:
-				a = palvelupisteet[0].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 1400, 100, () -> {
-					processCustomer(a, palvelupisteet[0]);
-					kontrolleri.updateQueueLength(palvelupisteet[0].getQueueLength());
-					kontrolleri.updateServedCustomers(palvelupisteet[0].getServedCustomers());
-					kontrolleri.updateAverageWaitingTime(palvelupisteet[0].getAverageWaitingTime());
-					kontrolleri.updateAverageSerciceTime(palvelupisteet[0].getAverageServiceTime());
-					kontrolleri.updateTotalTime(palvelupisteet[0].getTotalTime());
-					kontrolleri.exitCustomer(a.getId(), 1400, 650);
-				});
-				break;
-
-			case PALVELUNVALINTA:
+				kontrolleri.drawCustomer(a.getId(), a.getX(), a.getY());
+			}
+			case PALVELUNVALINTA -> {
 				a = palvelupisteet[1].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 550, 250,  () -> {
+				ServicePoint config = getServiceConfig(type);
+				kontrolleri.moveCustomer(a.getId(), config.x(), config.y(), () -> {
 					redirectToService(a);
-					kontrolleri.PVupdateQueueLength(palvelupisteet[1].getQueueLength());
-					kontrolleri.PVupdateServedCustomers(palvelupisteet[1].getServedCustomers());
-					kontrolleri.PVupdateAverageWaitingTime(palvelupisteet[1].getAverageWaitingTime());
-					kontrolleri.PVupdateAverageSerciceTime(palvelupisteet[1].getAverageServiceTime());
-					kontrolleri.PVupdateTotalTime(palvelupisteet[1].getTotalTime());
+					updateStats(palvelupisteet[1]);
 				});
-				break;
-
-			case NOUTOLAHETA:
-				a = palvelupisteet[2].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 600, 350, () -> {
-					processCustomer(a, palvelupisteet[2]);
-					kontrolleri.NTupdateQueueLength(palvelupisteet[2].getQueueLength());
-					kontrolleri.NTupdateServedCustomers(palvelupisteet[2].getServedCustomers());
-					kontrolleri.NTupdateAverageWaitingTime(palvelupisteet[2].getAverageWaitingTime());
-					kontrolleri.NTupdateAverageSerciceTime(palvelupisteet[2].getAverageServiceTime());
-					kontrolleri.NTupdateTotalTime(palvelupisteet[2].getTotalTime());
-					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+			}
+			case PAKETTIAUTOMAATTI, NOUTOLAHETA, ERITYISTAPAUKSET -> {
+				int index = type == TapahtumanTyyppi.PAKETTIAUTOMAATTI ? 0 :
+						type == TapahtumanTyyppi.NOUTOLAHETA ? 2 : 3;
+				a = palvelupisteet[index].otaJonosta();
+				ServicePoint config = getServiceConfig(type);
+				kontrolleri.moveCustomer(a.getId(), config.x(), config.y(), () -> {
+					processCustomer(a, palvelupisteet[index]);
+					// Update stats AFTER processing the customer
+					updateStats(palvelupisteet[index]);
+					kontrolleri.exitCustomer(a.getId(), config.exitX(), config.exitY());
 				});
-				break;
-
-			case ERITYISTAPAUKSET:
-				a = palvelupisteet[3].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 600, 700, () -> {
-					processCustomer(a, palvelupisteet[3]);
-					kontrolleri.ETupdateQueueLength(palvelupisteet[3].getQueueLength());
-					kontrolleri.ETupdateServedCustomers(palvelupisteet[3].getServedCustomers());
-					kontrolleri.ETupdateAverageWaitingTime(palvelupisteet[3].getAverageWaitingTime());
-					kontrolleri.ETupdateAverageSerciceTime(palvelupisteet[3].getAverageServiceTime());
-					kontrolleri.ETupdateTotalTime(palvelupisteet[3].getTotalTime());
-					kontrolleri.exitCustomer(a.getId(), 1400, 650);
-				});
-				break;
+			}
 		}
 	}
 
@@ -167,7 +152,7 @@ public class OmaMoottori extends Moottori {
 		a.setPoistumisaika(Kello.getInstance().getAika());
 		updateServiceTimeStats(a);
 		servedCustomers++;
-	    kontrolleri.updateTotalServedCustomers(servedCustomers);
+		kontrolleri.updateTotalServedCustomers(servedCustomers);
 		System.out.println("Asiakas " + a.getId() + " valmis " + p.getType() + " palvelutiskiltä");
 		a.raportti();
 	}
@@ -201,19 +186,89 @@ public class OmaMoottori extends Moottori {
 
 	@Override
 	protected void tulokset() {
-		System.out.println("\nSimulointi päättyi kello " + Kello.getInstance().getAika());
-		System.out.println("Palvellut asiakkaat (Poistumiseen asti): " + Asiakas.palvellut);
-		// Print service point statistics
-		for (Palvelupiste p : palvelupisteet) {
-			printServicePointStats(p);
+
+		kontrolleri.waitForAnimations(() -> {
+			System.out.println("\nSimulointi päättyi kello " + Kello.getInstance().getAika());
+
+			int[] finalQueueLengths = new int[palvelupisteet.length];
+			for (int i = 0; i < palvelupisteet.length; i++) {
+				finalQueueLengths[i] = palvelupisteet[i].getQueueLength();
+			}
+
+			double finalAvg18to40 = count18to40 > 0 ? totalServiceTime18to40 / count18to40 : 0;
+			double finalAvg41to60 = count41to60 > 0 ? totalServiceTime41to60 / count41to60 : 0;
+			double finalAvg60Plus = count60Plus > 0 ? totalServiceTime60Plus / count60Plus : 0;
+
+			for (Palvelupiste p : palvelupisteet) {
+				if (p != null) {
+					updateStats(p);
+				}
+			}
+
+			PakettiautomaattiTulos paTulos = new PakettiautomaattiTulos(
+					finalQueueLengths[0],
+					palvelupisteet[0].getServedCustomers(),
+					palvelupisteet[0].getAverageWaitingTime(),
+					palvelupisteet[0].getAverageServiceTime(),
+					palvelupisteet[0].getTotalTime()
+			);
+
+			PalvelunvalintaTulos pvTulos = new PalvelunvalintaTulos(
+					finalQueueLengths[1],
+					palvelupisteet[1].getServedCustomers(),
+					palvelupisteet[1].getAverageWaitingTime(),
+					palvelupisteet[1].getAverageServiceTime(),
+					palvelupisteet[1].getTotalTime()
+			);
+
+			NoutolahetaTulos nlTulos = new NoutolahetaTulos(
+					finalQueueLengths[2],
+					palvelupisteet[2].getServedCustomers(),
+					palvelupisteet[2].getAverageWaitingTime(),
+					palvelupisteet[2].getAverageServiceTime(),
+					palvelupisteet[2].getTotalTime()
+			);
+
+			ErityistapauksetTulos etTulos = new ErityistapauksetTulos(
+					finalQueueLengths[3],
+					palvelupisteet[3].getServedCustomers(),
+					palvelupisteet[3].getAverageWaitingTime(),
+					palvelupisteet[3].getAverageServiceTime(),
+					palvelupisteet[3].getTotalTime()
+			);
+
+			PalveluaikaIkaTulos ikaTulos = new PalveluaikaIkaTulos(
+					finalAvg18to40,
+					finalAvg41to60,
+					finalAvg60Plus
+			);
+
+			this.tulokset = new Tulokset(
+					Kello.getInstance().getAika(),
+					servedCustomers,
+					nlTulos,
+					pvTulos,
+					paTulos,
+					etTulos,
+					ikaTulos
+			);
+
+			tallennaTulokset();
+
+			// Print final statistics
+			for (Palvelupiste p : palvelupisteet) {
+				printServicePointStats(p);
+			}
+			printAverageServiceTimeByAge();
+			kontrolleri.naytaLoppuaika(Kello.getInstance().getAika());
+		});
 		}
 
-		// Print average service time by age group
-		printAverageServiceTimeByAge();
-
-		// UUTTA graafista
-		kontrolleri.naytaLoppuaika(Kello.getInstance().getAika());
-
+	public void tallennaTulokset() {
+		if (tulokset != null) {
+			tuloksetDao.tallenna(tulokset);
+			System.out.println("Simulaation tulokset tallennettu tietokantaan.");
+		}
 	}
 
 	private void printServicePointStats(Palvelupiste p) {

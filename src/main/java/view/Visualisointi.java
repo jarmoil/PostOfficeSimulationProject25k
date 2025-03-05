@@ -1,8 +1,6 @@
 package view;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.SequentialTransition;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -28,6 +26,10 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     private static final double MIN_DISTANCE = 3 * CUSTOMER_RADIUS;
     private static final double areaWidth = 100;
     private static final double areaHeight = 100;
+    private Timeline timeline;
+
+    private int activeAnimations = 0;
+    private Runnable completionCallback;
 
     public Visualisointi(int w, int h, BorderPane root) {
         super(w, h);
@@ -43,6 +45,16 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     }
 
     // Animaatio hommelit siirretty tänne
+
+    @Override
+    public boolean isAnimating() {
+        return activeAnimations > 0;
+    }
+
+    @Override
+    public void onAllAnimationsComplete(Runnable callback) {
+        this.completionCallback = callback;
+    }
 
     @Override
     public void drawCustomer(int id, double areaX, double areaY) {
@@ -83,14 +95,45 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
         Circle customer = (Circle) root.lookup("#customer-" + id);
         if (customer != null) {
+            activeAnimations++;
             Point2D oldPosition = new Point2D(customer.getCenterX(), customer.getCenterY());
             occupiedPositions.remove(oldPosition);
 
-            TranslateTransition transition = new TranslateTransition(Duration.seconds(1), customer);
-            transition.setToX(toX - customer.getCenterX());
-            transition.setToY(toY - customer.getCenterY());
-            transition.setOnFinished(event -> onFinished.run());
-            transition.play();
+            double deltaX = toX - customer.getCenterX();
+            double deltaY = toY - customer.getCenterY();
+            double duration = 1.0;
+            int frames = (int) (duration * 60);
+            double stepX = deltaX / frames;
+            double stepY = deltaY / frames;
+
+            timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
+                customer.setCenterX(customer.getCenterX() + stepX);
+                customer.setCenterY(customer.getCenterY() + stepY);
+            }));
+            timeline.setCycleCount(frames);
+            timeline.setOnFinished(event -> {
+                onFinished.run();
+                activeAnimations--;
+                if (activeAnimations == 0 && completionCallback != null) {
+                    completionCallback.run();
+                    completionCallback = null;
+                }
+            });
+            timeline.play();
+        }
+    }
+
+    @Override
+    public void pauseAnimation() {
+        if (timeline != null) {
+            timeline.pause();
+        }
+    }
+
+    @Override
+    public void resumeAnimation() {
+        if (timeline != null) {
+            timeline.play();
         }
     }
 
@@ -98,29 +141,36 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     public void exitCustomer(int id, double toX, double toY) {
         Circle customer = (Circle) root.lookup("#customer-" + id);
         if (customer != null) {
+            activeAnimations++;
             Point2D oldPosition = new Point2D(customer.getCenterX(), customer.getCenterY());
             occupiedPositions.remove(oldPosition);
 
-            TranslateTransition transition = new TranslateTransition(Duration.seconds(1), customer);
-            transition.setToX(toX - customer.getCenterX());
-            transition.setToY(toY - customer.getCenterY());
+            double deltaX = toX - customer.getCenterX();
+            double deltaY = toY - customer.getCenterY();
+            double duration = 1.0;
+            int frames = (int) (duration * 60);
+            double stepX = deltaX / frames;
+            double stepY = deltaY / frames;
 
-            FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), customer);
-            fadeTransition.setToValue(0);
-
-            SequentialTransition sequentialTransition = new SequentialTransition(transition, fadeTransition);
-            sequentialTransition.setOnFinished(event -> root.getChildren().remove(customer));
-            sequentialTransition.play();
+            timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
+                customer.setCenterX(customer.getCenterX() + stepX);
+                customer.setCenterY(customer.getCenterY() + stepY);
+            }));
+            timeline.setCycleCount(frames);
+            timeline.setOnFinished(event -> {
+                FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), customer);
+                fadeTransition.setToValue(0);
+                fadeTransition.setOnFinished(e -> {
+                    root.getChildren().remove(customer);
+                    activeAnimations--;
+                    if (activeAnimations == 0 && completionCallback != null) {
+                        completionCallback.run();
+                        completionCallback = null;
+                    }
+                });
+                fadeTransition.play();
+            });
+            timeline.play();
         }
     }
-
-    //jotenkin tällein, pitää varmaan jokaiselle palvelupisteelle
-    // olla oma metodi et ne pystyy sijottamaan eri kohtiin, kai?
-
-    /*public void uusiPalvelupiste(int x, int y) {
-        gc.setFill(Color.BROWN);
-        gc.fillRect(i,j,40,20);
-        i = x;
-        j = y;
-    }*/
 }
