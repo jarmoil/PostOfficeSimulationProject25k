@@ -10,4 +10,5 @@ public interface IKontrolleriForV {
     public void jatka();
     public void pysayta();
     void set();
+    void history();
 }

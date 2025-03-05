@@ -1,6 +1,7 @@
 package simu.framework;
 import controller.IKontrolleriForM; // UUSI
 import javafx.application.Platform;
+import static view.Visualisointi.openNewWindow;
 
 public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÄÄRITYKSET
 	
@@ -99,6 +100,10 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 				}
 			}
 		}
+	}
+
+	public void history(){
+		openNewWindow();
 	}
 
 	private void suoritaBTapahtumat(){

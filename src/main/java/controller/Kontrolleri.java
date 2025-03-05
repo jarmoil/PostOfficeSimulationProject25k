@@ -59,6 +59,13 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
         }
     }
 
+    @Override
+    public void history(){
+        if (moottori != null){
+            Platform.runLater(()-> {moottori.history();});
+        }
+    }
+
     // Simulointitulosten välittämistä käyttöliittymään.
     // Koska FX-ui:n päivitykset tulevat moottorisäikeestä, ne pitää ohjata JavaFX-säikeeseen:
 

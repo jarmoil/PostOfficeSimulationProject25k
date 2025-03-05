@@ -9,8 +9,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.control.Button;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,10 +38,19 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         tyhjennaNaytto();
     }
 
-
     public void tyhjennaNaytto() {
         gc.setFill(Color.SANDYBROWN);
         gc.fillRect(0, 0, this.getWidth(), this.getHeight());
+    }
+
+    public static void openNewWindow(){
+        Stage newWindow = new Stage();
+        VBox root = new VBox(10, new Button("Close"));
+        Scene newScene = new Scene(root, 500, 500);
+
+        newWindow.setTitle("History");
+        newWindow.setScene(newScene);
+        newWindow.show();
     }
 
     // Animaatio hommelit siirretty tänne
