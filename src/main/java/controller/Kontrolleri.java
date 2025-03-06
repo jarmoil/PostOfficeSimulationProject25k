@@ -60,6 +60,13 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
             ui.getVisualisointi().pauseAnimation();
         }
     }
+    //public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
+    @Override
+    public void set(){
+        if (moottori != null){
+            Platform.runLater(()-> {moottori.set();});
+        }
+    }
 
     // Simulointitulosten välittämistä käyttöliittymään.
     // Koska FX-ui:n päivitykset tulevat moottorisäikeestä, ne pitää ohjata JavaFX-säikeeseen:
@@ -184,7 +191,13 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
 
     @Override
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
-        Platform.runLater(() -> ui.getVisualisointi().moveCustomer(id, toX, toY, onFinished));
+        Platform.runLater(() -> {
+            ui.getVisualisointi().moveCustomer(id, toX, toY, () ->{
+                if (onFinished != null){
+                    onFinished.run();
+                }
+            });
+        });
     }
 
     @Override
