@@ -2,18 +2,23 @@ package view;
 
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 
 import controller.*;
 
+import dao.TuloksetDao;
+import entity.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import simu.framework.Trace;
@@ -33,6 +38,9 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
     // Heitin root borderpanen tänne, käytän sitä useammassa metodissa
     private BorderPane root;
+
+    private HistoryDetailView currentDetailView;
+
 
     // Käyttöliittymäkomponentit:
     private TextField aika;
@@ -104,6 +112,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private Button nopeutaButton;
     private Button pysaytaButton;
     private Button jatkaButton;
+    private Button historyButton;
 
 
     private IVisualisointi naytto;
@@ -113,8 +122,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     public void init() {
 
         Trace.setTraceLevel(Level.INFO);
-
-        kontrolleri = new Kontrolleri(this);
+        TuloksetDao dao = new TuloksetDao();
+        kontrolleri = new Kontrolleri(this, dao);
     }
 
     @Override
@@ -158,6 +167,10 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             pysaytaButton = new Button();
             pysaytaButton.setText("Pysäytä");
             pysaytaButton.setOnAction(e -> kontrolleri.pysayta());
+
+            historyButton = new Button();
+            historyButton.setText("History");
+            historyButton.setOnAction(e-> kontrolleri.naytaHistoriaData());
 
             aikaLabel = new Label("Simulointiaika:");
             aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
@@ -474,7 +487,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             buttonBox.setAlignment(Pos.BOTTOM_CENTER);
             buttonBox.setSpacing(10); // spacing between buttons
             buttonBox.setPadding(new Insets(15, 12, 15, 12)); // margins top, right, bottom, left
-            buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton, jatkaButton, pysaytaButton);
+            buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton, jatkaButton, pysaytaButton, historyButton);
             buttonBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
             buttonBox.setOpacity(0.8);
 
@@ -495,6 +508,78 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
 
     //Käyttöliittymän rajapintametodit (kutsutaan kontrollerista)
+
+    @Override
+    public void naytaHistoriaData(List<Tulokset> data) {
+        Platform.runLater(() -> {
+            if (data != null) {
+                TableView<Tulokset> table = createHistoryTable();
+                table.getItems().clear();
+                table.getItems().addAll(data);
+                showHistoryDialog(table);
+            }
+        });
+    }
+
+    @Override
+    public void paivitaHistoriaYksityiskohdat(Tulokset tulos) {
+        Platform.runLater(() -> {
+            if (currentDetailView != null && tulos != null) {
+                currentDetailView.updateDetails(tulos);
+            }
+        });
+    }
+
+    private void showHistoryDialog(TableView<Tulokset> table) {
+        try {
+            Stage historyStage = new Stage();
+            historyStage.initModality(Modality.APPLICATION_MODAL);
+            historyStage.setTitle("Simulation History");
+
+            // Details panel
+            currentDetailView = new HistoryDetailView();
+            ScrollPane scrollPane = new ScrollPane(currentDetailView);
+            scrollPane.setFitToWidth(true);
+
+            // Selection listener
+            table.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    kontrolleri.paivitaHistoriaYksityiskohdat(newVal);
+                }
+            });
+
+            // Layout
+            SplitPane splitPane = new SplitPane(table, scrollPane);
+            splitPane.setDividerPositions(0.6);
+
+            Scene scene = new Scene(splitPane, 1200, 600);
+            historyStage.setScene(scene);
+
+            // Clear reference when closing
+            historyStage.setOnHidden(e -> currentDetailView = null);
+
+            historyStage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private TableView<Tulokset> createHistoryTable() {
+        TableView<Tulokset> table = new TableView<>();
+        table.setMinWidth(800);
+
+        TableColumn<Tulokset, Integer> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        TableColumn<Tulokset, Double> timeCol = new TableColumn<>("Kokonaisaika");
+        timeCol.setCellValueFactory(new PropertyValueFactory<>("kokonaisaika"));
+
+        TableColumn<Tulokset, Integer> servedCol = new TableColumn<>("Palveltu");
+        servedCol.setCellValueFactory(new PropertyValueFactory<>("palveltu"));
+
+        table.getColumns().addAll(idCol, timeCol, servedCol);
+        return table;
+    }
 
     @Override
     public double getAika() {

@@ -1,18 +1,24 @@
 package controller;
 
 import javafx.application.Platform;
+import simu.framework.IDao;
 import simu.framework.IMoottori;
 import simu.model.OmaMoottori;
 import view.ISimulaattorinUI;
+import entity.*;
+
+import java.util.List;
 
 
 public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUSI
 
     private IMoottori moottori;
     private ISimulaattorinUI ui;
+    private IDao tuloksetDao;
 
-    public Kontrolleri(ISimulaattorinUI ui) {
+    public Kontrolleri(ISimulaattorinUI ui, IDao dao) {
         this.ui = ui;
+        this.tuloksetDao = dao;
 
     }
 
@@ -194,6 +200,17 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
                 callback.run();
             }
         });
+    }
+
+    @Override
+    public void naytaHistoriaData() {
+        List<Tulokset> historyData = tuloksetDao.lataaKaikki();
+        Platform.runLater(() -> ui.naytaHistoriaData(historyData));
+    }
+
+    @Override
+    public void paivitaHistoriaYksityiskohdat(Tulokset tulos) {
+        Platform.runLater(() -> ui.paivitaHistoriaYksityiskohdat(tulos));
     }
 
 

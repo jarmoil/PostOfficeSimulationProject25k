@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "erityistapaukset")
-public class ErityistapauksetTulos {
+public class ErityistapauksetTulos implements IServicePointTulos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
