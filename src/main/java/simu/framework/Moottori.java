@@ -1,5 +1,6 @@
 package simu.framework;
 import controller.IKontrolleriForM; // UUSI
+import dao.TuloksetDao;
 
 public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ„Ã„RITYKSET
 	
@@ -7,6 +8,7 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 	private long viive = 0;
 	private boolean paused = false;
 	private final Object lock = new Object();
+	public TuloksetDao tuloksetDao;
 	
 	private Kello kello;
 	
@@ -17,6 +19,8 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 	public Moottori(IKontrolleriForM kontrolleri){
 
 		this.kontrolleri = kontrolleri;
+
+		this.tuloksetDao = new TuloksetDao(); // UUSI
 
 		kello = Kello.getInstance(); // Otetaan kello muuttujaan yksinkertaistamaan koodia
 		
@@ -81,6 +85,25 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 			lock.notify();
 		}
 	}
+
+	public void set(){
+		synchronized (lock){
+			double targetTime = kello.getAika() + 0.5;
+
+			while (kello.getAika() < targetTime && simuloidaan()){
+				double seuraavanAika = tapahtumalista.getSeuraavanAika();
+
+				if (seuraavanAika > kello.getAika() && seuraavanAika <= targetTime){
+					kello.setAika(seuraavanAika);
+					suoritaBTapahtumat();
+					yritaCTapahtumat();
+				} else {
+					kello.setAika(targetTime);
+				}
+			}
+		}
+	}
+
 
 	private void suoritaBTapahtumat(){
 		while (tapahtumalista.getSeuraavanAika() == kello.getAika()){

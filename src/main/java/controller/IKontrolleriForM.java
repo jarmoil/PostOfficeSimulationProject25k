@@ -37,10 +37,14 @@ public interface IKontrolleriForM {
     public void ETupdateAverageSerciceTime(double averageServiceTime);
     public void ETupdateTotalTime(double totalTime);
 
+    void updateServicePointStats(simu.model.TapahtumanTyyppi type, int queueLength, int servedCustomers,
+                                 double avgWaitTime, double avgServiceTime, double totalTime);
     // Animaatio huommelit
     public void drawCustomer(int id, double x, double y);
     public void exitCustomer(int id, double toX, double toY);
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished);
+
+    void waitForAnimations(Runnable callback);
 
     // X , Y koordinaatit palvelupisteille / asiakkaille
     public Point2D AloitusCoord();

@@ -2,17 +2,24 @@ package controller;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
+import simu.framework.IDao;
 import simu.framework.IMoottori;
 import simu.model.OmaMoottori;
 import view.ISimulaattorinUI;
+import entity.*;
+
+import java.util.List;
+
 
 public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUSI
 
     private IMoottori moottori;
     private ISimulaattorinUI ui;
+    private IDao tuloksetDao;
 
-    public Kontrolleri(ISimulaattorinUI ui) {
+    public Kontrolleri(ISimulaattorinUI ui, IDao dao) {
         this.ui = ui;
+        this.tuloksetDao = dao;
 
     }
 
@@ -44,6 +51,7 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     public void jatka(){
         if (moottori != null){
             moottori.jatkaSimulaatio();
+            ui.getVisualisointi().resumeAnimation();
         }
     }
 
@@ -51,6 +59,14 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     public void pysayta(){
         if(moottori != null){
             moottori.pysaytaSimulaatio();
+            ui.getVisualisointi().pauseAnimation();
+        }
+    }
+    //public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
+    @Override
+    public void set(){
+        if (moottori != null){
+            Platform.runLater(()-> {moottori.set();});
         }
     }
 
@@ -124,7 +140,45 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     @Override
     public void ETupdateTotalTime(double totalTime) {Platform.runLater(()->ui.ETpaivitaKokonaisAika(totalTime));}
 
-
+    @Override
+    public void updateServicePointStats(simu.model.TapahtumanTyyppi type, int queueLength,
+                                        int servedCustomers, double avgWaitTime, double avgServiceTime, double totalTime) {
+        Platform.runLater(() -> {
+            switch (type) {
+                case PAKETTIAUTOMAATTI -> {
+                    ui.paivitaJonoPituus(queueLength);
+                    ui.paivitaPalveltuMaara(servedCustomers);
+                    ui.paivitaKeskimJonoAika(avgWaitTime);
+                    ui.paivitaKeskimPalveluAika(avgServiceTime);
+                    ui.paivitaKokonaisAika(totalTime);
+                }
+                case PALVELUNVALINTA -> {
+                    ui.PVpaivitaJonoPituus(queueLength);
+                    ui.PVpaivitaPalveltuMaara(servedCustomers);
+                    ui.PVpaivitaKeskimJonoAika(avgWaitTime);
+                    ui.PVpaivitaKeskimPalveluAika(avgServiceTime);
+                    ui.PVpaivitaKokonaisAika(totalTime);
+                }
+                case NOUTOLAHETA -> {
+                    ui.NTpaivitaJonoPituus(queueLength);
+                    ui.NTpaivitaPalveltuMaara(servedCustomers);
+                    ui.NTpaivitaKeskimJonoAika(avgWaitTime);
+                    ui.NTpaivitaKeskimPalveluAika(avgServiceTime);
+                    ui.NTpaivitaKokonaisAika(totalTime);
+                }
+                case ERITYISTAPAUKSET -> {
+                    ui.ETpaivitaJonoPituus(queueLength);
+                    ui.ETpaivitaPalveltuMaara(servedCustomers);
+                    ui.ETpaivitaKeskimJonoAika(avgWaitTime);
+                    ui.ETpaivitaKeskimPalveluAika(avgServiceTime);
+                    ui.ETpaivitaKokonaisAika(totalTime);
+                }
+                case ARR1 -> {
+                    // No UI updates needed for arrivals
+                }
+            }
+        });
+    }
     // Animaatio hommelit
 
     @Override
@@ -163,6 +217,7 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     public Point2D NTCoord() {
         return ui.getVisualisointi().NTCoord();
     }
+
     @Override
     public Point2D ETCoord() {
         return ui.getVisualisointi().ETCoord();
@@ -170,5 +225,31 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     @Override
     public Point2D ExitCoord() {
         return ui.getVisualisointi().ExitCoord();
+    }
+
+    @Override
+    public void waitForAnimations(Runnable callback) {
+        Platform.runLater(() -> {
+            if (ui.getVisualisointi().isAnimating()) {
+                // If animations are running, wait for them to complete
+                ui.getVisualisointi().onAllAnimationsComplete(() -> {
+                    callback.run();
+                });
+            } else {
+                // If no animations are running, execute callback immediately
+                callback.run();
+            }
+        });
+    }
+
+    @Override
+    public void naytaHistoriaData() {
+        List<Tulokset> historyData = tuloksetDao.lataaKaikki();
+        Platform.runLater(() -> ui.naytaHistoriaData(historyData));
+    }
+
+    @Override
+    public void paivitaHistoriaYksityiskohdat(Tulokset tulos) {
+        Platform.runLater(() -> ui.paivitaHistoriaYksityiskohdat(tulos));
     }
 }
