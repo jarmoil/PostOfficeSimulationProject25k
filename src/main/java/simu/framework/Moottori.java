@@ -1,6 +1,6 @@
 package simu.framework;
 import controller.IKontrolleriForM; // UUSI
-import javafx.application.Platform;
+import dao.TuloksetDao;
 
 public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÄÄRITYKSET
 	
@@ -8,6 +8,7 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 	private long viive = 0;
 	private boolean paused = false;
 	private final Object lock = new Object();
+	public TuloksetDao tuloksetDao;
 	
 	private Kello kello;
 	
@@ -18,6 +19,8 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 	public Moottori(IKontrolleriForM kontrolleri){ // UUSITTU
 
 		this.kontrolleri = kontrolleri; //UUSI
+
+		this.tuloksetDao = new TuloksetDao(); // UUSI
 
 		kello = Kello.getInstance(); // Otetaan kello muuttujaan yksinkertaistamaan koodia
 		
@@ -101,6 +104,7 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 		}
 	}
 
+
 	private void suoritaBTapahtumat(){
 		while (tapahtumalista.getSeuraavanAika() == kello.getAika()){
 			suoritaTapahtuma(tapahtumalista.poista());
@@ -130,5 +134,5 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 	protected abstract void alustukset(); // Määritellään simu.model-pakkauksessa Moottorin aliluokassa
 
 	protected abstract void tulokset(); // Määritellään simu.model-pakkauksessa Moottorin aliluokassa
-
+	
 }

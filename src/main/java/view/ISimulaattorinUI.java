@@ -1,5 +1,9 @@
 package view;
 
+import entity.Tulokset;
+
+import java.util.List;
+
 public interface ISimulaattorinUI {
 
     // Kontrolleri tarvitsee syötteitä, jotka se välittää Moottorille
@@ -42,6 +46,9 @@ public interface ISimulaattorinUI {
     public void ETpaivitaKeskimPalveluAika(double averageServiceTime);
     public void ETpaivitaKokonaisAika(double totalTime);
 
+    // History view methods
+    void naytaHistoriaData(List<Tulokset> data);
+    void paivitaHistoriaYksityiskohdat(Tulokset tulos);
 
     // Kontrolleri tarvitsee
     public IVisualisointi getVisualisointi();
