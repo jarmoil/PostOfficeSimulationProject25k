@@ -1,6 +1,8 @@
 package controller;
 
 
+import javafx.geometry.Point2D;
+
 public interface IKontrolleriForM {
 
     // Rajapinta, joka tarjotaan moottorille:
@@ -40,5 +42,11 @@ public interface IKontrolleriForM {
     public void exitCustomer(int id, double toX, double toY);
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished);
 
-    //public void visualisoiPalvelupiste();
+    // X , Y koordinaatit palvelupisteille / asiakkaille
+    public Point2D AloitusCoord();
+    public Point2D PACoord();
+    public Point2D PVCoord();
+    public Point2D NTCoord();
+    public Point2D ETCoord();
+    public Point2D ExitCoord();
 }

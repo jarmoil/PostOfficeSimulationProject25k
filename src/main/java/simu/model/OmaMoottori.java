@@ -4,6 +4,8 @@ import controller.IKontrolleriForM;
 import simu.framework.*;
 import eduni.distributions.Negexp;
 import eduni.distributions.Normal;
+
+import java.awt.geom.Point2D;
 import java.util.Random;
 
 public class OmaMoottori extends Moottori {
@@ -65,14 +67,9 @@ public class OmaMoottori extends Moottori {
 				/* Piirretään asiakas näytölle, voisi olla joku fadein animaatio tai vaikkapa liike
 				   vähän niin kuin ruudun ulkopuolelta tuleva asiakas (saapuu palvelupisteelle)
 				 */
-				kontrolleri.drawCustomer(a.getId(), a.getX(), a.getY()); // UUSI
+				kontrolleri.drawCustomer(a.getId(), kontrolleri.AloitusCoord().getX(), kontrolleri.AloitusCoord().getY()); // UUSI
 
 				break;
-
-				/*
-				kaikki noi kontrolleri.updateQueueLength yms yms vois laittaa yhteen metodiin ja kutsua sitä
-				 noissa caseissa, niin koodi olis vähän siistimpää
-				 */
 
 			/*
 			Animaatioita muutettu niin, että ensin asiakas liikkuu palvelupisteeelle -> processCustomer ja muut hommat ->
@@ -81,16 +78,16 @@ public class OmaMoottori extends Moottori {
 
 			case PAKETTIAUTOMAATTI:
 				a = palvelupisteet[0].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 1400, 100, () -> {
+				kontrolleri.moveCustomer(a.getId(), kontrolleri.PACoord().getX(), kontrolleri.PACoord().getY(), () -> {
 					processCustomer(a, palvelupisteet[0]);
 					updatePakettiautomaatti();
-					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+					kontrolleri.exitCustomer(a.getId(), kontrolleri.ExitCoord().getX(), kontrolleri.ExitCoord().getY());
 				});
 				break;
 
 			case PALVELUNVALINTA:
 				a = palvelupisteet[1].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 550, 250,  () -> {
+				kontrolleri.moveCustomer(a.getId(), kontrolleri.PVCoord().getX(), kontrolleri.PVCoord().getY(),  () -> {
 					redirectToService(a);
 					updatePalvelunvalinta();
 				});
@@ -98,19 +95,19 @@ public class OmaMoottori extends Moottori {
 
 			case NOUTOLAHETA:
 				a = palvelupisteet[2].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 600, 350, () -> {
+				kontrolleri.moveCustomer(a.getId(), kontrolleri.NTCoord().getX(), kontrolleri.NTCoord().getY(), () -> {
 					processCustomer(a, palvelupisteet[2]);
 					updateNoutolaheta();
-					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+					kontrolleri.exitCustomer(a.getId(), kontrolleri.ExitCoord().getX(), kontrolleri.ExitCoord().getY());
 				});
 				break;
 
 			case ERITYISTAPAUKSET:
 				a = palvelupisteet[3].otaJonosta();
-				kontrolleri.moveCustomer(a.getId(), 600, 700, () -> {
+				kontrolleri.moveCustomer(a.getId(), kontrolleri.ETCoord().getX(), kontrolleri.ETCoord().getY(), () -> {
 					processCustomer(a, palvelupisteet[3]);
 					updateErikoistapaus();
-					kontrolleri.exitCustomer(a.getId(), 1400, 650);
+					kontrolleri.exitCustomer(a.getId(), kontrolleri.ExitCoord().getX(), kontrolleri.ExitCoord().getY());
 				});
 				break;
 		}

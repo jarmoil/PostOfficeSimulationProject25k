@@ -23,10 +23,6 @@ public class Asiakas {
 	public Asiakas(){
 		id = i++;
 
-		// Asetetaan aloitus koordinaatit, parempi ratkaisu myöhemmin
-		x = 350;
-		y = 100;
-
 		// Random ikä välillä 18 - 80
 		Random random = new Random();
 		age = random.nextInt(63) + 18; // 18-80
@@ -41,14 +37,6 @@ public class Asiakas {
 	}
 	public void setAge(int age) {
 		this.age = age;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
 	}
 
 	public double getPoistumisaika() {

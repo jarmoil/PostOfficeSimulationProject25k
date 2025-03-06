@@ -108,6 +108,9 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
     private IVisualisointi naytto;
 
+    private static final int WIDTH = 1024;
+    private static final int HEIGHT = 768;
+
 
     @Override
     public void init() {
@@ -132,6 +135,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
 
             primaryStage.setTitle("Posti simulaattori");
+            primaryStage.setWidth(WIDTH);
+            primaryStage.setHeight(HEIGHT);
 
             kaynnistaButton = new Button();
             kaynnistaButton.setText("Käynnistä simulointi");

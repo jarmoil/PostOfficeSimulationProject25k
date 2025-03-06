@@ -17,6 +17,7 @@ import java.util.List;
 public class Visualisointi extends Canvas implements IVisualisointi{
 
     private final GraphicsContext gc;
+
     // Heitin root borderpanen tänne, käytän sitä useammassa metodissa
     private BorderPane root;
 
@@ -34,12 +35,91 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         this.root = root;
         gc = this.getGraphicsContext2D();
         tyhjennaNaytto();
+        visualisoiPalvelupisteet();
+
+        // Bindataan canvaksen koko rootin kokoon
+        this.widthProperty().bind(root.widthProperty());
+        this.heightProperty().bind(root.heightProperty());
+
+        // Canvaksen päivitystä kun muutetaan ikkunan kokoa
+        root.widthProperty().addListener((obs, oldVal, newVal) -> updateCanvas());
+        root.heightProperty().addListener((obs, oldVal, newVal) -> updateCanvas());
     }
 
-
+    // Canvaksen päivitys kun ikkunan kokoa muutetaan
+    private void updateCanvas() {
+        tyhjennaNaytto();
+        visualisoiPalvelupisteet();
+    }
+    // Alustetaan näyttö
     public void tyhjennaNaytto() {
         gc.setFill(Color.SANDYBROWN);
         gc.fillRect(0, 0, this.getWidth(), this.getHeight());
+    }
+
+    public void visualisoiAloitus() {
+        gc.setFill(Color.BROWN);
+        gc.fillText("Aloitus", 0, (this.getHeight()/2) - 10);
+        gc.fillRect(0, (this.getHeight()/2), 40, 60);
+    }
+    public Point2D AloitusCoord() {
+        return new Point2D((root.getWidth()-this.getWidth()), ((root.getHeight()-this.getHeight()) + (this.getHeight()/2)-30));
+        // vähennetään rootin leveys canvaksen leveydestä, jotta saadaan aloitus canvaksen vasempaan reunaan.
+    }
+
+    public void visualisoiPA() {
+        gc.setFill(Color.BLACK);
+        gc.fillText("Pakettiautomaatti", (this.getWidth()/4), (this.getHeight()/3 + this.getHeight()/3) - 10);
+        gc.fillRect((this.getWidth()/4), (this.getHeight()/3 + this.getHeight()/3), 50, 50);
+    }
+
+    public Point2D PACoord() {
+        return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/4)) - CUSTOMER_RADIUS, ((root.getHeight()-this.getHeight()) +(this.getHeight()/3 + this.getHeight()/3)) - 25 );
+    }
+
+    public void visualisoiPV() {
+        gc.setFill(Color.BLACK);
+        gc.fillText("Palvelunvalinta", (this.getWidth()/4), (this.getHeight()/3) - 10);
+        gc.fillRect((this.getWidth()/4), (this.getHeight()/3), 50, 50);
+    }
+    public Point2D PVCoord() {
+        return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/4)) - CUSTOMER_RADIUS, ((root.getHeight() - this.getHeight()) + this.getHeight()/3) - 25);
+    }
+
+    public void visualisoiNT() {
+        gc.setFill(Color.BLACK);
+        gc.fillText("Nouto/Lähetä", (this.getWidth()/3), 60);
+        gc.fillRect((this.getWidth()/3), 0, 100, 50);
+    }
+    public Point2D NTCoord() {
+        return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/3)) + 50, (root.getHeight() - this.getHeight()));
+    }
+
+    public void visualisoiET() {
+        gc.setFill(Color.BLACK);
+        gc.fillText("Erikoistapaukset", (this.getWidth()/3 + this.getWidth()/3), 60);
+        gc.fillRect((this.getWidth()/3 + this.getWidth()/3), 0, 100, 50);
+    }
+    public Point2D ETCoord() {
+        return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/3) + (this.getWidth()/3)) + 50, (root.getHeight() - this.getHeight()));
+    }
+
+    public void visualisoiExit() {
+        gc.setFill(Color.RED);
+        gc.fillText("Exit", this.getWidth()-40, (this.getHeight()/2) - 10);
+        gc.fillRect(this.getWidth()-40, this.getHeight()/2, 40, 60);
+    }
+    public Point2D ExitCoord() {
+        return new Point2D((root.getWidth()-40), ((root.getHeight() - this.getHeight()) + (this.getHeight()/2)-30));
+    }
+
+    public void visualisoiPalvelupisteet() {
+        visualisoiAloitus();
+        visualisoiPA();
+        visualisoiPV();
+        visualisoiNT();
+        visualisoiET();
+        visualisoiExit();
     }
 
     // Animaatio hommelit siirretty tänne
@@ -113,14 +193,4 @@ public class Visualisointi extends Canvas implements IVisualisointi{
             sequentialTransition.play();
         }
     }
-
-    //jotenkin tällein, pitää varmaan jokaiselle palvelupisteelle
-    // olla oma metodi et ne pystyy sijottamaan eri kohtiin, kai?
-
-    /*public void uusiPalvelupiste(int x, int y) {
-        gc.setFill(Color.BROWN);
-        gc.fillRect(i,j,40,20);
-        i = x;
-        j = y;
-    }*/
 }

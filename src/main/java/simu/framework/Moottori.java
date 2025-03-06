@@ -12,11 +12,11 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 	
 	protected Tapahtumalista tapahtumalista;
 
-	protected IKontrolleriForM kontrolleri; // UUSI
+	protected IKontrolleriForM kontrolleri;
 
-	public Moottori(IKontrolleriForM kontrolleri){ // UUSITTU
+	public Moottori(IKontrolleriForM kontrolleri){
 
-		this.kontrolleri = kontrolleri; //UUSI
+		this.kontrolleri = kontrolleri;
 
 		kello = Kello.getInstance(); // Otetaan kello muuttujaan yksinkertaistamaan koodia
 		

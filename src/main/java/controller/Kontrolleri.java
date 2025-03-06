@@ -1,6 +1,7 @@
 package controller;
 
 import javafx.application.Platform;
+import javafx.geometry.Point2D;
 import simu.framework.IMoottori;
 import simu.model.OmaMoottori;
 import view.ISimulaattorinUI;
@@ -24,6 +25,7 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
         moottori.setSimulointiaika(ui.getAika());
         moottori.setViive(ui.getViive());
         ui.getVisualisointi().tyhjennaNaytto();
+        ui.getVisualisointi().visualisoiPalvelupisteet();
         ((Thread)moottori).start();
         //((Thread)moottori).run(); // Ei missään tapauksessa näin. Miksi?
     }
@@ -136,19 +138,37 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     }
 
     @Override
-    public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
-        Platform.runLater(() -> ui.getVisualisointi().moveCustomer(id, toX, toY, onFinished));
-    }
-
-
-
-
-
-    /*public void visualisoiPalvelupiste() {
-        Platform.runLater(new Runnable(){
-            public void run(){
-                ui.getVisualisointi().uusiPalvelupiste(100, 200);
+    public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {Platform.runLater(() -> {
+        ui.getVisualisointi().moveCustomer(id, toX, toY, () ->{
+            if (onFinished != null){
+                onFinished.run();
             }
         });
-    }*/
+    });
+    }
+
+    @Override
+    public Point2D AloitusCoord() {
+        return ui.getVisualisointi().AloitusCoord();
+    }
+    @Override
+    public Point2D PACoord() {
+        return ui.getVisualisointi().PACoord();
+    }
+    @Override
+    public Point2D PVCoord() {
+        return ui.getVisualisointi().PVCoord();
+    }
+    @Override
+    public Point2D NTCoord() {
+        return ui.getVisualisointi().NTCoord();
+    }
+    @Override
+    public Point2D ETCoord() {
+        return ui.getVisualisointi().ETCoord();
+    }
+    @Override
+    public Point2D ExitCoord() {
+        return ui.getVisualisointi().ExitCoord();
+    }
 }
