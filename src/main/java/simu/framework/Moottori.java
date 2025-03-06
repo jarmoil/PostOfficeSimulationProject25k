@@ -86,6 +86,24 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 		}
 	}
 
+	public void set(){
+		synchronized (lock){
+			double targetTime = kello.getAika() + 0.5;
+
+			while (kello.getAika() < targetTime && simuloidaan()){
+				double seuraavanAika = tapahtumalista.getSeuraavanAika();
+
+				if (seuraavanAika > kello.getAika() && seuraavanAika <= targetTime){
+					kello.setAika(seuraavanAika);
+					suoritaBTapahtumat();
+					yritaCTapahtumat();
+				} else {
+					kello.setAika(targetTime);
+				}
+			}
+		}
+	}
+
 
 	private void suoritaBTapahtumat(){
 		while (tapahtumalista.getSeuraavanAika() == kello.getAika()){
