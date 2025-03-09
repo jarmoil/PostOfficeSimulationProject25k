@@ -1,6 +1,9 @@
 package controller;
 
 import entity.Tulokset;
+import javafx.scene.control.TableView;
+
+import java.util.List;
 
 public interface IKontrolleriForV {
 
@@ -13,6 +16,7 @@ public interface IKontrolleriForV {
     public void pysayta();
     void set();
     void stopSim();
+    void poistaHistoria(Tulokset tulos);
 
     public void naytaHistoriaData();
     public void paivitaHistoriaYksityiskohdat(Tulokset tulos);

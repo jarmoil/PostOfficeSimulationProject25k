@@ -555,7 +555,6 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             Stage historyStage = new Stage();
             historyStage.initModality(Modality.APPLICATION_MODAL);
             historyStage.setTitle("Simulation History");
-
             // Details panel
             currentDetailView = new HistoryDetailView();
             ScrollPane scrollPane = new ScrollPane(currentDetailView);
@@ -568,11 +567,33 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                 }
             });
 
+            //Delete button
+            Button deleteButton = new Button("Delete");
+            deleteButton.setOnAction(e -> {
+                Tulokset selectedTulos = table.getSelectionModel().getSelectedItem();
+                if (selectedTulos != null) {
+                    // Controller deletes selected item
+                    kontrolleri.poistaHistoria(selectedTulos);
+                    // Deleting it from the view as well
+                    table.getItems().remove(selectedTulos);
+
+                }
+            });
+
             // Layout
+            HBox bottomButtonBox = new HBox();
+            bottomButtonBox.setAlignment(Pos.BOTTOM_RIGHT);
+            bottomButtonBox.setSpacing(10);
+            bottomButtonBox.getChildren().add(deleteButton);
+
             SplitPane splitPane = new SplitPane(table, scrollPane);
             splitPane.setDividerPositions(0.6);
 
-            Scene scene = new Scene(splitPane, 1200, 600);
+            BorderPane dialogLayout = new BorderPane();
+            dialogLayout.setCenter(splitPane);
+            dialogLayout.setBottom(bottomButtonBox);
+
+            Scene scene = new Scene(dialogLayout, 1200, 600);
             historyStage.setScene(scene);
 
             // Clear reference when closing

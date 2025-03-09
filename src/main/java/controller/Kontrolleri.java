@@ -8,6 +8,7 @@ import simu.model.OmaMoottori;
 import view.ISimulaattorinUI;
 import entity.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -81,6 +82,17 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
             Platform.runLater(()-> {moottori.set();});
         }
     }
+
+    @Override
+    public void poistaHistoria(Tulokset tulos){
+        boolean success = tuloksetDao.deleteTulos(tulos);
+        if (success){
+            System.out.println("Tulokset has been deleted");
+        }else {
+            System.out.println("Tulokset couldn't be deleted");
+        }
+    }
+
 
     // Simulointitulosten välittämistä käyttöliittymään.
     // Koska FX-ui:n päivitykset tulevat moottorisäikeestä, ne pitää ohjata JavaFX-säikeeseen:
