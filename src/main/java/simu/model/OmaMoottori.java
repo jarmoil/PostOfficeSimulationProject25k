@@ -1,13 +1,11 @@
 package simu.model;
 
 import controller.IKontrolleriForM;
-import dao.TuloksetDao;
 import entity.*;
 import simu.framework.*;
 import eduni.distributions.Negexp;
 import eduni.distributions.Normal;
 
-import java.awt.geom.Point2D;
 import java.util.Random;
 
 public class OmaMoottori extends Moottori {
@@ -59,10 +57,10 @@ public class OmaMoottori extends Moottori {
 
 
 
-	public OmaMoottori(IKontrolleriForM kontrolleri) {
-		super (kontrolleri);
+	public OmaMoottori(IKontrolleriForM kontrolleri, IDao dao) {
+		super (kontrolleri, dao);
 
-		tuloksetDao = new TuloksetDao();
+		tuloksetDao = dao;
 		palvelupisteet = new Palvelupiste[4];
 
 		// Initialize service points
@@ -79,7 +77,6 @@ public class OmaMoottori extends Moottori {
 	@Override
 	protected void alustukset() {
 		saapumisprosessi.generoiSeuraava(); // First arrival in the system
-
 
 	}
 
@@ -141,12 +138,20 @@ public class OmaMoottori extends Moottori {
 	}
 
 	private void redirectToService(Asiakas a) {
+		ServicePoint next;
+
 		if (random.nextBoolean()) {
-			palvelupisteet[2].lisaaJonoon(a); // Nouto/Lähetä
-			System.out.println("Asiakas " + a.getId() + " ohjattu nouto/lähetä palvelutiskille.");
+			next = getServiceConfig(TapahtumanTyyppi.NOUTOLAHETA);
+			kontrolleri.moveCustomer(a.getId(), next.x(), next.y(), () -> {
+				palvelupisteet[2].lisaaJonoon(a);
+				System.out.println("Asiakas " + a.getId() + " ohjattu nouto/lähetä palvelutiskille.");
+			});
 		} else {
-			palvelupisteet[3].lisaaJonoon(a); // Erityistapaus
-			System.out.println("Asiakas " + a.getId() + " ohjattu erityistapaus palvelutiskille.");
+			next = getServiceConfig(TapahtumanTyyppi.ERITYISTAPAUKSET);
+			kontrolleri.moveCustomer(a.getId(), next.x(), next.y(), () -> {
+				palvelupisteet[3].lisaaJonoon(a);
+				System.out.println("Asiakas " + a.getId() + " ohjattu erityistapaus palvelutiskille.");
+			});
 		}
 	}
 

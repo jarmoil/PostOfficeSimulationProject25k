@@ -12,8 +12,6 @@ public interface IKontrolleriForV {
     public void jatka();
     public void pysayta();
     void set();
-    void stopSim();
-
     public void naytaHistoriaData();
     public void paivitaHistoriaYksityiskohdat(Tulokset tulos);
 }

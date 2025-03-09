@@ -1,32 +1,39 @@
 package dao;
 
 import simu.framework.IDao;
-import entity.*;
+import entity.Tulokset;
 import datasource.DatabaseConnection;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
 
 import java.util.List;
-import jakarta.persistence.EntityManager;
-
-
+import java.util.ArrayList;
 
 public class TuloksetDao implements IDao {
 
     @Override
     public void tallenna(Tulokset tulokset) {
+        EntityManager em = DatabaseConnection.getInstance();
         try {
-            EntityManager em = DatabaseConnection.getInstance();
             em.getTransaction().begin();
             em.persist(tulokset);
             em.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (PersistenceException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Database save failed: " + e.getMessage(), e);
         }
     }
 
     @Override
     public List<Tulokset> lataaKaikki() {
         EntityManager em = DatabaseConnection.getInstance();
-        List<Tulokset> tulokset = em.createQuery("SELECT t FROM Tulokset t", Tulokset.class).getResultList();
-        return tulokset;
+        try {
+            return em.createQuery("SELECT t FROM Tulokset t", Tulokset.class)
+                    .getResultList();
+        } catch (PersistenceException e) {
+            throw new RuntimeException("Database load failed: " + e.getMessage(), e);
+        }
     }
 }

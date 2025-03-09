@@ -13,6 +13,10 @@ import java.util.List;
 
 public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUSI
 
+    private void runOnFXThread(Runnable action) {
+        Platform.runLater(action);
+    }
+
     private IMoottori moottori;
     private ISimulaattorinUI ui;
     private IDao tuloksetDao;
@@ -28,7 +32,7 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
 
     @Override
     public void kaynnistaSimulointi() {
-        moottori = new OmaMoottori(this); // luodaan uusi moottorisäie jokaista simulointia varten
+        moottori = new OmaMoottori(this, this.tuloksetDao); // luodaan uusi moottorisäie jokaista simulointia varten
         moottori.setSimulointiaika(ui.getAika());
         moottori.setViive(ui.getViive());
         ui.getVisualisointi().tyhjennaNaytto();
@@ -62,18 +66,6 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
             ui.getVisualisointi().pauseAnimation();
         }
     }
-
-    @Override
-    public void stopSim(){
-        if(moottori != null){
-            moottori.stopSimulaatio();
-            moottori.setSimulointiaika(ui.getAika());
-            moottori.setViive(ui.getViive());
-            ui.getVisualisointi().tyhjennaNaytto();
-            ui.getVisualisointi().visualisoiPalvelupisteet();
-        }
-    }
-
     //public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
     @Override
     public void set(){
@@ -87,7 +79,7 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
 
     @Override
     public void naytaLoppuaika(double aika) {
-        Platform.runLater(()->ui.setLoppuaika(aika));
+        runOnFXThread(() -> ui.setLoppuaika(aika));
     }
     @Override
     public void naytaLoppuaikaNuori(double aika) {
@@ -103,54 +95,6 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     }
     @Override
     public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
-
-    // PAKETTIAUTOMAATTI
-    @Override
-    public void updateQueueLength(int queueLength) {Platform.runLater(()->ui.paivitaJonoPituus(queueLength));}
-    @Override
-    public void updateServedCustomers(int servedCustomers) {Platform.runLater(()->ui.paivitaPalveltuMaara(servedCustomers));}
-    @Override
-    public void updateAverageWaitingTime(double averageWaitingTime) {Platform.runLater(()->ui.paivitaKeskimJonoAika(averageWaitingTime));}
-    @Override
-    public void updateAverageSerciceTime(double averageServiceTime) {Platform.runLater(()->ui.paivitaKeskimPalveluAika(averageServiceTime));}
-    @Override
-    public void updateTotalTime(double totalTime) {Platform.runLater(()->ui.paivitaKokonaisAika(totalTime));}
-
-    // PALVELUNVALINTA
-    @Override
-    public void PVupdateQueueLength(int queueLength) {Platform.runLater(()->ui.PVpaivitaJonoPituus(queueLength));}
-    @Override
-    public void PVupdateServedCustomers(int servedCustomers) {Platform.runLater(()->ui.PVpaivitaPalveltuMaara(servedCustomers));}
-    @Override
-    public void PVupdateAverageWaitingTime(double averageWaitingTime) {Platform.runLater(()->ui.PVpaivitaKeskimJonoAika(averageWaitingTime));}
-    @Override
-    public void PVupdateAverageSerciceTime(double averageServiceTime) {Platform.runLater(()->ui.PVpaivitaKeskimPalveluAika(averageServiceTime));}
-    @Override
-    public void PVupdateTotalTime(double totalTime) {Platform.runLater(()->ui.PVpaivitaKokonaisAika(totalTime));}
-
-    // NOUTOLÄHETÄ
-    @Override
-    public void NTupdateQueueLength(int queueLength) {Platform.runLater(()->ui.NTpaivitaJonoPituus(queueLength));}
-    @Override
-    public void NTupdateServedCustomers(int servedCustomers) {Platform.runLater(()->ui.NTpaivitaPalveltuMaara(servedCustomers));}
-    @Override
-    public void NTupdateAverageWaitingTime(double averageWaitingTime) {Platform.runLater(()->ui.NTpaivitaKeskimJonoAika(averageWaitingTime));}
-    @Override
-    public void NTupdateAverageSerciceTime(double averageServiceTime) {Platform.runLater(()->ui.NTpaivitaKeskimPalveluAika(averageServiceTime));}
-    @Override
-    public void NTupdateTotalTime(double totalTime) {Platform.runLater(()->ui.NTpaivitaKokonaisAika(totalTime));}
-
-    // ERIKOISTAPAUS
-    @Override
-    public void ETupdateQueueLength(int queueLength) {Platform.runLater(()->ui.ETpaivitaJonoPituus(queueLength));}
-    @Override
-    public void ETupdateServedCustomers(int servedCustomers) {Platform.runLater(()->ui.ETpaivitaPalveltuMaara(servedCustomers));}
-    @Override
-    public void ETupdateAverageWaitingTime(double averageWaitingTime) {Platform.runLater(()->ui.ETpaivitaKeskimJonoAika(averageWaitingTime));}
-    @Override
-    public void ETupdateAverageSerciceTime(double averageServiceTime) {Platform.runLater(()->ui.ETpaivitaKeskimPalveluAika(averageServiceTime));}
-    @Override
-    public void ETupdateTotalTime(double totalTime) {Platform.runLater(()->ui.ETpaivitaKokonaisAika(totalTime));}
 
     @Override
     public void updateServicePointStats(simu.model.TapahtumanTyyppi type, int queueLength,
@@ -204,13 +148,19 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     }
 
     @Override
-    public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {Platform.runLater(() -> {
-        ui.getVisualisointi().moveCustomer(id, toX, toY, () ->{
-            if (onFinished != null){
-                onFinished.run();
+    public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
+        runOnFXThread(() -> ui.getVisualisointi().moveCustomer(id, toX, toY, onFinished));
+    }
+
+    @Override
+    public void waitForAnimations(Runnable callback) {
+        runOnFXThread(() -> {
+            if (ui.getVisualisointi().isAnimating()) {
+                ui.getVisualisointi().onAllAnimationsComplete(callback);
+            } else {
+                callback.run();
             }
         });
-    });
     }
 
     @Override
@@ -239,20 +189,6 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
         return ui.getVisualisointi().ExitCoord();
     }
 
-    @Override
-    public void waitForAnimations(Runnable callback) {
-        Platform.runLater(() -> {
-            if (ui.getVisualisointi().isAnimating()) {
-                // If animations are running, wait for them to complete
-                ui.getVisualisointi().onAllAnimationsComplete(() -> {
-                    callback.run();
-                });
-            } else {
-                // If no animations are running, execute callback immediately
-                callback.run();
-            }
-        });
-    }
 
     @Override
     public void naytaHistoriaData() {
