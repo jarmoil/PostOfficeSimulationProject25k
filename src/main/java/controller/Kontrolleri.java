@@ -62,6 +62,18 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
             ui.getVisualisointi().pauseAnimation();
         }
     }
+
+    @Override
+    public void stopSim(){
+        if(moottori != null){
+            moottori.stopSimulaatio();
+            moottori.setSimulointiaika(ui.getAika());
+            moottori.setViive(ui.getViive());
+            ui.getVisualisointi().tyhjennaNaytto();
+            ui.getVisualisointi().visualisoiPalvelupisteet();
+        }
+    }
+
     //public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
     @Override
     public void set(){

@@ -50,7 +50,7 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     }
 
     // Canvaksen päivitys kun ikkunan kokoa muutetaan
-    private void updateCanvas() {
+    public void updateCanvas() {
         tyhjennaNaytto();
         visualisoiPalvelupisteet();
     }

@@ -9,6 +9,7 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 	private boolean paused = false;
 	private final Object lock = new Object();
 	public TuloksetDao tuloksetDao;
+	private boolean checkStopSim = false;
 	
 	private Kello kello;
 	
@@ -67,7 +68,11 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 			
 			Trace.out(Trace.Level.INFO, "\nC-vaihe:" );
 			yritaCTapahtumat();
-
+			synchronized (lock){
+				if(checkStopSim == true){
+					break;
+				}
+			}
 		}
 		tulokset();
 		
@@ -101,6 +106,12 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÃ
 					kello.setAika(targetTime);
 				}
 			}
+		}
+	}
+
+	public void stopSimulaatio(){
+		synchronized (lock){
+			checkStopSim = true;
 		}
 	}
 

@@ -114,6 +114,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private Button jatkaButton;
     private Button historyButton;
     private Button setButton;
+    private Button stopButton;
+    private Button newSimButton;
 
 
     private IVisualisointi naytto;
@@ -181,6 +183,14 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             historyButton = new Button();
             historyButton.setText("History");
             historyButton.setOnAction(e-> kontrolleri.naytaHistoriaData());
+
+            stopButton = new Button();
+            stopButton.setText("Stop Sim");
+            stopButton.setOnAction(e-> kontrolleri.stopSim());
+
+            newSimButton = new Button();
+            newSimButton.setText("New Sim");
+            newSimButton.setOnAction(e->kontrolleri.kaynnistaSimulointi());
 
             aikaLabel = new Label("Simulointiaika:");
             aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
@@ -497,7 +507,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             buttonBox.setAlignment(Pos.BOTTOM_CENTER);
             buttonBox.setSpacing(10); // spacing between buttons
             buttonBox.setPadding(new Insets(15, 12, 15, 12)); // margins top, right, bottom, left
-            buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton, jatkaButton, pysaytaButton, setButton, historyButton);
+            buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton, jatkaButton, pysaytaButton, setButton, historyButton, stopButton, newSimButton);
             buttonBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
             buttonBox.setOpacity(0.8);
 

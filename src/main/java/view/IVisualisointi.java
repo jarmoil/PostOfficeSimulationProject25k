@@ -22,5 +22,6 @@ public interface IVisualisointi {
     public void resumeAnimation();
     boolean isAnimating();
     void onAllAnimationsComplete(Runnable callback);
+    void updateCanvas();
 }
 

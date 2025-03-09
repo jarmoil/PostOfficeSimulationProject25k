@@ -11,4 +11,5 @@ public interface IMoottori { // UUSI
     void jatkaSimulaatio();
     void pysaytaSimulaatio();
     void set();
+    void stopSimulaatio();
 }
