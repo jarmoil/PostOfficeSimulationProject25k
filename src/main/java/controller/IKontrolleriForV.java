@@ -14,4 +14,5 @@ public interface IKontrolleriForV {
     void set();
     public void naytaHistoriaData();
     public void paivitaHistoriaYksityiskohdat(Tulokset tulos);
+    void clearHistory();
 }

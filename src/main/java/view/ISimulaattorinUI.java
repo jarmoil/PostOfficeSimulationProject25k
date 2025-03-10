@@ -50,6 +50,13 @@ public interface ISimulaattorinUI {
     void naytaHistoriaData(List<Tulokset> data);
     void paivitaHistoriaYksityiskohdat(Tulokset tulos);
 
+    // Distribuuution valitsemis metodit
+    String getDistributionType(int servicePoint);
+    double getDistributionMean(int servicePoint);
+    double getDistributionVariance(int servicePoint);
+    double getArrivalProbability();
+    double getRedirectProbability();
+
     // Kontrolleri tarvitsee
     public IVisualisointi getVisualisointi();
 }

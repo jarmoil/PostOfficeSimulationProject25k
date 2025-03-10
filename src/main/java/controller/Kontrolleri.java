@@ -32,7 +32,8 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
 
     @Override
     public void kaynnistaSimulointi() {
-        moottori = new OmaMoottori(this, this.tuloksetDao); // luodaan uusi moottorisäie jokaista simulointia varten
+        moottori = new OmaMoottori(this, this.tuloksetDao,
+                 getDistributionTypes(), getDistributionMeans(), getDistributionVariances()); // luodaan uusi moottorisäie jokaista simulointia varten
         moottori.setSimulointiaika(ui.getAika());
         moottori.setViive(ui.getViive());
         ui.getVisualisointi().tyhjennaNaytto();
@@ -199,5 +200,58 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     @Override
     public void paivitaHistoriaYksityiskohdat(Tulokset tulos) {
         Platform.runLater(() -> ui.paivitaHistoriaYksityiskohdat(tulos));
+    }
+
+    // Distribution related methods
+    @Override
+    public String[] getDistributionTypes() {
+        String[] types = new String[4];
+        for (int i = 0; i < 4; i++) {
+            types[i] = ui.getDistributionType(i);
+        }
+        return types;
+    }
+
+    @Override
+    public double[] getDistributionMeans() {
+        double[] means = new double[4];
+        for (int i = 0; i < 4; i++) {
+            means[i] = ui.getDistributionMean(i);
+        }
+        return means;
+    }
+
+    @Override
+    public double[] getDistributionVariances() {
+        double[] variances = new double[4];
+        for (int i = 0; i < 4; i++) {
+            variances[i] = ui.getDistributionVariance(i);
+        }
+        return variances;
+    }
+
+    @Override
+    public double getArrivalProbability() {
+        return ui.getArrivalProbability();
+    }
+
+    @Override
+    public double getRedirectProbability() {
+        return ui.getRedirectProbability();
+    }
+
+    @Override
+    public double getAika() {
+        return ui.getAika();
+    }
+
+    @Override
+    public long getViive() {
+        return ui.getViive();
+    }
+
+    @Override
+    public void clearHistory() {
+        tuloksetDao.truncateAll();
     }
 }

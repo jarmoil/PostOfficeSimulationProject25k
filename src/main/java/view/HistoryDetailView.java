@@ -44,6 +44,9 @@ public class HistoryDetailView extends VBox {
         addDetailRow("Keskim. jonotusaika:", tulos.getKeskimjonoaika());
         addDetailRow("Keskim. palveluaika:", tulos.getKeskimpalveluaika());
         addDetailRow("Kokonaisaika:", tulos.getKokonaisaika());
+        addDetailRow("Syötetty jakauma: ", tulos.getDistribuutio());
+        addDetailRow("Syötetty keskiarvo: ", tulos.getMean());
+        addDetailRow("Syötetty varianssi: ", tulos.getVar());
         addSeparator();
     }
 
@@ -59,6 +62,15 @@ public class HistoryDetailView extends VBox {
         Label labelNode = new Label(label);
         labelNode.setMinWidth(120);
         Label valueNode = new Label(value instanceof Double ? df.format(value) : value.toString());
+        row.getChildren().addAll(labelNode, valueNode);
+        getChildren().add(row);
+    }
+
+    private void addDetailRow(String label, String value) {
+        HBox row = new HBox(10);
+        Label labelNode = new Label(label);
+        labelNode.setMinWidth(120);
+        Label valueNode = new Label(value);
         row.getChildren().addAll(labelNode, valueNode);
         getChildren().add(row);
     }

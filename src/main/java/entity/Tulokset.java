@@ -16,6 +16,18 @@ public class Tulokset {
     @Column(name = "palveltu")
     private int palveltu;
 
+    @Column(name = "bernoulliArrival")
+    private double bernoulliArrival;
+
+    @Column(name = "bernoulliRedirect")
+    private double bernoulliRedirect;
+
+    @Column(name = "inputAika")
+    private double inputAika;
+
+    @Column(name = "inputViive")
+    private long inputViive;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id")
     private NoutolahetaTulos noutolahetaTulos;
@@ -38,11 +50,15 @@ public class Tulokset {
 
     public Tulokset() {}
 
-    public Tulokset(double kokonaisaika, int palveltu, NoutolahetaTulos noutolahetaTulos,
+    public Tulokset(double kokonaisaika, int palveltu, double bernoulliArrival, double bernoulliRedirect, double inputAika, long inputViive, NoutolahetaTulos noutolahetaTulos,
                     PalvelunvalintaTulos palvelunvalintaTulos, PakettiautomaattiTulos pakettiautomaattiTulos,
                     ErityistapauksetTulos erityistapauksetTulos, PalveluaikaIkaTulos palveluaikaIkaTulos) {
         this.kokonaisaika = kokonaisaika;
         this.palveltu = palveltu;
+        this.bernoulliArrival = bernoulliArrival;
+        this.bernoulliRedirect = bernoulliRedirect;
+        this.inputAika = inputAika;
+        this.inputViive = inputViive;
         this.noutolahetaTulos = noutolahetaTulos;
         this.palvelunvalintaTulos = palvelunvalintaTulos;
         this.pakettiautomaattiTulos = pakettiautomaattiTulos;
@@ -72,6 +88,38 @@ public class Tulokset {
 
     public void setPalveltu(int palveltu) {
         this.palveltu = palveltu;
+    }
+
+    public double getBernoulliArrival() {
+        return bernoulliArrival;
+    }
+
+    public void setBernoulliArrival(double bernoulliArrival) {
+        this.bernoulliArrival = bernoulliArrival;
+    }
+
+    public double getBernoulliRedirect() {
+        return bernoulliRedirect;
+    }
+
+    public void setBernoulliRedirect(double bernoulliRedirect) {
+        this.bernoulliRedirect = bernoulliRedirect;
+    }
+
+    public double getInputAika() {
+        return inputAika;
+    }
+
+    public void setInputAika(double inputAika) {
+        this.inputAika = inputAika;
+    }
+
+    public double getInputViive() {
+        return inputViive;
+    }
+
+    public void setInputViive(long inputViive) {
+        this.inputViive = inputViive;
     }
 
     public NoutolahetaTulos getNoutolahetaTulos() {

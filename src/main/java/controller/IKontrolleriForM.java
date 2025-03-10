@@ -20,6 +20,16 @@ public interface IKontrolleriForM {
     public void exitCustomer(int id, double toX, double toY);
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished);
 
+    // Distribuutio valitsemis hommelit
+    String[] getDistributionTypes();
+    double[] getDistributionMeans();
+    double[] getDistributionVariances();
+    double getArrivalProbability();
+    double getRedirectProbability();
+
+    double getAika();
+    long getViive();
+
     void waitForAnimations(Runnable callback);
 
     // X , Y koordinaatit palvelupisteille / asiakkaille

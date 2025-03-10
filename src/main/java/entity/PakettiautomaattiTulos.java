@@ -25,14 +25,27 @@ public class PakettiautomaattiTulos implements IServicePointTulos {
     @Column(name = "kokonaisaika")
     private double kokonaisaika;
 
+    @Column(name = "distribuutio")
+    private String distribuutio;
+
+    @Column(name = "mean")
+    private double mean;
+
+    @Column(name = "var")
+    private double var;
+
     public PakettiautomaattiTulos() {}
 
-    public PakettiautomaattiTulos(int jonossa, int palveltu, double keskimjonoaika, double keskimpalveluaika, double kokonaisaika) {
+    public PakettiautomaattiTulos(int jonossa, int palveltu, double keskimjonoaika, double keskimpalveluaika, double kokonaisaika,
+                                  String distribuutio, double mean, double var) {
         this.jonossa = jonossa;
         this.palveltu = palveltu;
         this.keskimjonoaika = keskimjonoaika;
         this.keskimpalveluaika = keskimpalveluaika;
         this.kokonaisaika = kokonaisaika;
+        this.distribuutio = distribuutio;
+        this.mean = mean;
+        this.var = var;
     }
 
     public int getId() {
@@ -82,4 +95,29 @@ public class PakettiautomaattiTulos implements IServicePointTulos {
     public void setKokonaisaika(double kokonaisaika) {
         this.kokonaisaika = kokonaisaika;
     }
+
+    public String getDistribuutio() {
+        return distribuutio;
+    }
+
+    public void setDistribuutio(String distribuutio) {
+        this.distribuutio = distribuutio;
+    }
+
+    public double getMean() {
+        return mean;
+    }
+
+    public void setMean(double mean) {
+        this.mean = mean;
+    }
+
+    public double getVar() {
+        return var;
+    }
+
+    public void setVar(double var) {
+        this.var = var;
+    }
+
 }
