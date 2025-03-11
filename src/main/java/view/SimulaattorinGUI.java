@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -132,6 +133,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private Button jatkaButton;
     private Button historyButton;
     private Button setButton;
+    private Button stopButton;
+    private Button newSimButton;
 
     private static final int WIDTH = 1024;
     private static final int HEIGHT = 768;
@@ -171,10 +174,33 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             });
             hidastaButton = createButton("Hidasta", e -> kontrolleri.hidasta());
             nopeutaButton = createButton("Nopeuta", e -> kontrolleri.nopeuta());
-            jatkaButton = createButton("Jatka", e -> kontrolleri.jatka());
-            pysaytaButton = createButton("Pysäytä", e -> kontrolleri.pysayta());
+
+            jatkaButton = createButton("Continue", e -> {
+                kontrolleri.jatka();
+                naytto.resumeAnimation();  // Use the visualization's resume method
+                jatkaButton.setDisable(true);
+                pysaytaButton.setDisable(false);
+            });
+
+            pysaytaButton = createButton("Pause", e -> {
+                kontrolleri.pysayta();
+                naytto.pauseAnimation();  // Use the visualization's pause method
+                pysaytaButton.setDisable(true);
+                jatkaButton.setDisable(false);
+            });
+
             setButton = createButton("Set", e -> kontrolleri.set());
             historyButton = createButton("History", e -> kontrolleri.naytaHistoriaData());
+
+            stopButton = new Button();
+            stopButton.setText("Stop Sim");
+            stopButton.setOnAction(e-> kontrolleri.stopSim());
+
+            newSimButton = new Button("New Sim");
+            newSimButton.setOnAction(e -> {
+                kontrolleri.stopSim(); // Stop current simulation
+                resetSimulation();     // Reset UI and visualization
+            });
 
             aikaLabel = new Label("Simulointiaika:");
             aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
@@ -488,10 +514,54 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private HBox createButtonBox() {
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.BOTTOM_CENTER);
-        buttonBox.setSpacing(10);
-        buttonBox.setPadding(new Insets(15, 12, 15, 12));
-        buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton,
-                jatkaButton, pysaytaButton, setButton, historyButton);
+        buttonBox.setSpacing(15); // Increased spacing
+        buttonBox.setPadding(new Insets(15));
+
+        // Main simulation controls group
+        HBox simControls = new HBox(10);
+        simControls.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton,
+                jatkaButton, pysaytaButton);
+
+        // Utility controls group
+        HBox utilityControls = new HBox(10);
+        utilityControls.getChildren().addAll(setButton, historyButton);
+
+        // Reset controls group
+        HBox resetControls = new HBox(10);
+        resetControls.getChildren().addAll(stopButton, newSimButton);
+
+        // Add tooltips
+        kaynnistaButton.setTooltip(new Tooltip("Start the simulation"));
+        nopeutaButton.setTooltip(new Tooltip("Increase simulation speed"));
+        hidastaButton.setTooltip(new Tooltip("Decrease simulation speed"));
+        jatkaButton.setTooltip(new Tooltip("Continue paused simulation"));
+        pysaytaButton.setTooltip(new Tooltip("Pause simulation"));
+        setButton.setTooltip(new Tooltip("Apply settings"));
+        historyButton.setTooltip(new Tooltip("View simulation history"));
+        stopButton.setTooltip(new Tooltip("Stop current simulation"));
+        newSimButton.setTooltip(new Tooltip("Start a new simulation"));
+
+        // Style buttons
+        String buttonStyle = "-fx-font-size: 12px; -fx-min-width: 80px;";
+        kaynnistaButton.setStyle(buttonStyle);
+        nopeutaButton.setStyle(buttonStyle);
+        hidastaButton.setStyle(buttonStyle);
+        jatkaButton.setStyle(buttonStyle);
+        pysaytaButton.setStyle(buttonStyle);
+        setButton.setStyle(buttonStyle);
+        historyButton.setStyle(buttonStyle);
+        stopButton.setStyle(buttonStyle);
+        newSimButton.setStyle(buttonStyle);
+
+        // Add separators between groups
+        buttonBox.getChildren().addAll(
+                simControls,
+                new Separator(Orientation.VERTICAL),
+                utilityControls,
+                new Separator(Orientation.VERTICAL),
+                resetControls
+        );
+
         buttonBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
         buttonBox.setOpacity(0.8);
         return buttonBox;
@@ -502,6 +572,49 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         Button button = new Button(text);
         button.setOnAction(handler);
         return button;
+    }
+
+    private void resetSimulation() {
+
+        // Reset clock
+        Platform.runLater(() -> {
+            kontrolleri.resetClock();  // Add this method to your controller interface
+        });
+
+        // Clear visualization
+        naytto.cleanUp();
+
+        // Reset all labels
+        Platform.runLater(() -> {
+            tulos.setText("");
+            palvellutAsiakasMaara.setText("");
+            tulosIkaNuori.setText("");
+            tulosIkaKeski.setText("");
+            tulosIkaVanha.setText("");
+            jonossa.setText("");
+            palveluMaara.setText("");
+            keskimJonoAika.setText("");
+            keskimPalveluAika.setText("");
+            kokonaisAika.setText("");
+            PVjonossa.setText("");
+            PVpalveluMaara.setText("");
+            PVkeskimJonoAika.setText("");
+            PVkeskimPalveluAika.setText("");
+            PVkokonaisAika.setText("");
+            NTjonossa.setText("");
+            NTpalveluMaara.setText("");
+            NTkeskimJonoAika.setText("");
+            NTkeskimPalveluAika.setText("");
+            NTkokonaisAika.setText("");
+            ETjonossa.setText("");
+            ETpalveluMaara.setText("");
+            ETkeskimJonoAika.setText("");
+            ETkeskimPalveluAika.setText("");
+            ETkokonaisAika.setText("");
+
+            // Re-enable start button
+            kaynnistaButton.setDisable(false);
+        });
     }
 
     // Metodi luo historiatietojen näyttöikkunan
@@ -539,10 +652,29 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                 }
             });
 
+            //Delete button
+            Button deleteButton = new Button("Delete");
+            deleteButton.setOnAction(e -> {
+                Tulokset selectedTulos = table.getSelectionModel().getSelectedItem();
+                if (selectedTulos != null) {
+                    // Controller deletes selected item
+                    kontrolleri.poistaHistoria(selectedTulos);
+                    // Deleting it from the view as well
+                    table.getItems().remove(selectedTulos);
+
+                }
+            });
+
             // Layout with clear button
             VBox rightPanel = new VBox(10);
             rightPanel.setPadding(new Insets(10));
-            rightPanel.getChildren().addAll(clearButton, scrollPane);
+
+            // Create a HBox for buttons
+            HBox buttonBox = new HBox(10);
+            buttonBox.getChildren().addAll(clearButton, deleteButton);
+
+            // Add button box and scrollPane to rightPanel
+            rightPanel.getChildren().addAll(buttonBox, scrollPane);
 
             // Split pane
             SplitPane splitPane = new SplitPane(table, rightPanel);

@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import simu.framework.IDao;
 import simu.framework.IMoottori;
+import simu.framework.Kello;
 import simu.model.OmaMoottori;
 import view.ISimulaattorinUI;
 import entity.*;
@@ -68,6 +69,20 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
             ui.getVisualisointi().pauseAnimation();
         }
     }
+
+    @Override
+    public void stopSim(){
+        if(moottori != null){
+            moottori.stopSimulaatio();
+            moottori.setSimulointiaika(ui.getAika());
+            moottori.setViive(ui.getViive());
+            ui.getVisualisointi().tyhjennaNaytto();
+            ui.getVisualisointi().visualisoiPalvelupisteet();
+            Platform.runLater(() -> ui.getVisualisointi().pauseAnimation());
+
+        }
+    }
+
     //public void updateTotalServedCustomers(int totalServedCustomers) {Platform.runLater(()->ui.paivitaAsiakasMaara(totalServedCustomers));}
     @Override
     public void set(){
@@ -265,5 +280,11 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
     @Override
     public void clearHistory() {
         tuloksetDao.truncateAll();
+    }
+
+    // In Kontrolleri.java
+    @Override
+    public void resetClock() {
+        Kello.getInstance().setAika(0);
     }
 }

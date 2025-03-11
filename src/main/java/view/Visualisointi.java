@@ -1,6 +1,7 @@
 package view;
 
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -22,22 +23,22 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     // Lista varatuista sijainneista
     private List<Point2D> occupiedPositions;
+    private final Object animationLock = new Object();
 
     // Asiakkaan koko, minimi välimatka kun luodaan asiakkaita, että ei mene päällekkäin jne.
     private static final double CUSTOMER_RADIUS = 10;
     private static final double MIN_DISTANCE = 3 * CUSTOMER_RADIUS;
     private static final double areaWidth = 100;
     private static final double areaHeight = 100;
-    private Timeline timeline;
+    private List<Timeline> activeAnimations = new ArrayList<>();  // Keep this one, remove the int version
+    private Timeline currentTimeline;  // For pause/resume functionality
+    private Runnable completionCallback;
+
 
     // Siirretty arvot tänne niin helppo muuttaa halutessaan
     private static final double ANIMATION_DURATION = 1.0;
     private static final int ANIMATION_FPS = 60;
     private static final double FADE_DURATION = 400;
-
-    // Katsotaan onko animaatioita käynnissä
-    private int activeAnimations = 0;
-    private Runnable completionCallback;
 
     public Visualisointi(int w, int h, BorderPane root) {
         super(w, h);
@@ -62,18 +63,9 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         updateCanvas();
     }
 
-    // Metodi jota voi hyödyntää ehkä sitten kun tehdään joku nappi STOP/START yms
-    public void cleanup() {
-        if (timeline != null) {
-            timeline.stop();
-        }
-        occupiedPositions.clear();
-        completionCallback = null;
-        activeAnimations = 0;
-    }
 
     // Canvaksen päivitys kun ikkunan kokoa muutetaan
-    private void updateCanvas() {
+    public void updateCanvas() {
         tyhjennaNaytto();
         visualisoiPalvelupisteet();
     }
@@ -151,6 +143,29 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     // Animaatio hommelit siirretty tänne
 
     @Override
+    public void cleanUp() {
+        Platform.runLater(() -> {
+            synchronized (animationLock) {
+                // Stop all active animations first
+                for (Timeline timeline : activeAnimations) {
+                    timeline.stop();
+                }
+                activeAnimations.clear();
+
+                // Clear other state
+                root.getChildren().removeIf(node -> node instanceof Circle);
+                occupiedPositions.clear();
+                currentTimeline = null;
+                completionCallback = null;
+
+                // Redraw
+                tyhjennaNaytto();
+                visualisoiPalvelupisteet();
+            }
+        });
+    }
+
+    @Override
     public void drawCustomer(int id, double areaX, double areaY) {
         double x = areaX;
         double y = areaY;
@@ -188,16 +203,12 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     // Pikku tälläne handleri jos asiakasta ei löydy (ei pitäisi tapahtua mutta kuiteski)
     private void handleCustomerNotFound(int id) {
         System.err.println("Customer with ID " + id + " not found");
-        if (activeAnimations > 0) {
-            activeAnimations--;
-        }
     }
 
     // Animaatio asiakkaan liikuttamiseen siirretty omaan metodiin, koska paljon eri logiikkaa siinä
     private void animateCustomer(Circle customer, double toX, double toY, boolean shouldFadeOut, Runnable onFinished) {
-        activeAnimations++;
-        Point2D oldPosition = new Point2D(customer.getCenterX(), customer.getCenterY());
-        occupiedPositions.remove(oldPosition);
+        // Remove the starting position from occupied positions
+        occupiedPositions.remove(new Point2D(customer.getCenterX(), customer.getCenterY()));
 
         double deltaX = toX - customer.getCenterX();
         double deltaY = toY - customer.getCenterY();
@@ -205,12 +216,17 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         double stepX = deltaX / frames;
         double stepY = deltaY / frames;
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
             customer.setCenterX(customer.getCenterX() + stepX);
             customer.setCenterY(customer.getCenterY() + stepY);
         }));
         timeline.setCycleCount(frames);
+
+        currentTimeline = timeline;
+        activeAnimations.add(timeline);
+
         timeline.setOnFinished(event -> {
+            activeAnimations.remove(timeline);
             if (shouldFadeOut) {
                 fadeOutAndRemove(customer, onFinished);
             } else {
@@ -226,6 +242,8 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         fadeTransition.setToValue(0);
         fadeTransition.setOnFinished(e -> {
             root.getChildren().remove(customer);
+            // Add this line to remove the position
+            occupiedPositions.remove(new Point2D(customer.getCenterX(), customer.getCenterY()));
             finishAnimation(onFinished);
         });
         fadeTransition.play();
@@ -236,8 +254,7 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         if (onFinished != null) {
             onFinished.run();
         }
-        activeAnimations--;
-        if (activeAnimations == 0 && completionCallback != null) {
+        if (activeAnimations.isEmpty() && completionCallback != null) {
             completionCallback.run();
             completionCallback = null;
         }
@@ -245,7 +262,9 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     @Override
     public boolean isAnimating() {
-        return activeAnimations > 0;
+        synchronized (animationLock) {
+            return !activeAnimations.isEmpty();
+        }
     }
 
     @Override
@@ -258,14 +277,17 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     @Override
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
-        Circle customer = (Circle) root.lookup("#customer-" + id);
-        if (customer != null) {
-            animateCustomer(customer, toX, toY, false, onFinished);
-        } else {
-            handleCustomerNotFound(id);
-        }
+        Platform.runLater(() -> {
+            Circle customer = (Circle) root.lookup("#customer-" + id);
+            if (customer != null) {
+                synchronized (animationLock) {
+                    animateCustomer(customer, toX, toY, false, onFinished);
+                }
+            } else {
+                handleCustomerNotFound(id);
+            }
+        });
     }
-
     @Override
     public void exitCustomer(int id, double toX, double toY) {
         Circle customer = (Circle) root.lookup("#customer-" + id);
@@ -278,15 +300,23 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     @Override
     public void pauseAnimation() {
-        if (timeline != null) {
-            timeline.pause();
-        }
+        Platform.runLater(() -> {
+            synchronized (animationLock) {
+                for (Timeline timeline : activeAnimations) {
+                    timeline.pause();
+                }
+            }
+        });
     }
 
     @Override
     public void resumeAnimation() {
-        if (timeline != null) {
-            timeline.play();
-        }
+        Platform.runLater(() -> {
+            synchronized (animationLock) {
+                for (Timeline timeline : activeAnimations) {
+                    timeline.play();
+                }
+            }
+        });
     }
 }
