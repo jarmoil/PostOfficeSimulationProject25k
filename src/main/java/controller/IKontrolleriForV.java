@@ -20,4 +20,7 @@ public interface IKontrolleriForV {
 
     public void naytaHistoriaData();
     public void paivitaHistoriaYksityiskohdat(Tulokset tulos);
+    void clearHistory();
+    // In IKontrolleriForV.java
+    void resetClock();
 }

@@ -1,31 +1,68 @@
 package dao;
 
 import simu.framework.IDao;
-import entity.*;
+import entity.Tulokset;
 import datasource.DatabaseConnection;
+
 import java.util.List;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceException;
+
 
 
 public class TuloksetDao implements IDao {
 
     @Override
     public void tallenna(Tulokset tulokset) {
+        EntityManager em = DatabaseConnection.getInstance();
         try {
-            EntityManager em = DatabaseConnection.getInstance();
             em.getTransaction().begin();
+            // Clear the persistence context first
+            em.clear();
+            // Detach the entity if it's managed
+            if (em.contains(tulokset)) {
+                em.detach(tulokset);
+            }
+            // Persist the new entity
             em.persist(tulokset);
             em.getTransaction().commit();
         } catch (Exception e) {
-            e.printStackTrace();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Database save failed: " + e.getMessage(), e);
         }
     }
 
     @Override
     public List<Tulokset> lataaKaikki() {
         EntityManager em = DatabaseConnection.getInstance();
-        List<Tulokset> tulokset = em.createQuery("SELECT t FROM Tulokset t", Tulokset.class).getResultList();
-        return tulokset;
+        try {
+            return em.createQuery("SELECT t FROM Tulokset t", Tulokset.class)
+                    .getResultList();
+        } catch (PersistenceException e) {
+            throw new RuntimeException("Database load failed: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void truncateAll() {
+        EntityManager em = DatabaseConnection.getInstance();
+        try {
+            em.getTransaction().begin();
+            em.createNativeQuery("TRUNCATE TABLE simuloinnit").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE erityistapaukset").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE noutolaheta").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE pakettiautomaatti").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE palvelunvalinta").executeUpdate();
+            em.createNativeQuery("TRUNCATE TABLE palveluaika_ika").executeUpdate();
+            em.getTransaction().commit();
+        } catch (PersistenceException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new RuntimeException("Database truncate failed: " + e.getMessage(), e);
+        }
     }
 
     @Override

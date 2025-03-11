@@ -1,6 +1,5 @@
 package simu.framework;
 import controller.IKontrolleriForM; // UUSI
-import dao.TuloksetDao;
 
 public abstract class Moottori extends Thread implements IMoottori{  // UUDET MÄÄRITYKSET
 	
@@ -8,20 +7,20 @@ public abstract class Moottori extends Thread implements IMoottori{  // UUDET M�
 	private long viive = 0;
 	private boolean paused = false;
 	private final Object lock = new Object();
-	public TuloksetDao tuloksetDao;
+	public IDao tuloksetDao;
 	private boolean checkStopSim = false;
-	
+
 	private Kello kello;
 	
 	protected Tapahtumalista tapahtumalista;
 
 	protected IKontrolleriForM kontrolleri;
 
-	public Moottori(IKontrolleriForM kontrolleri){
+	public Moottori(IKontrolleriForM kontrolleri, IDao dao){
 
 		this.kontrolleri = kontrolleri;
 
-		this.tuloksetDao = new TuloksetDao(); // UUSI
+		this.tuloksetDao = dao; // UUSI
 
 		kello = Kello.getInstance(); // Otetaan kello muuttujaan yksinkertaistamaan koodia
 		

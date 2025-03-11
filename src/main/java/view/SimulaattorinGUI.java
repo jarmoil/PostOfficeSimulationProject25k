@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -33,18 +34,36 @@ import javafx.scene.text.*;
 
 public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
-    //Kontrollerin esittely (tarvitaan käyttöliittymässä)
+    // Kontrolleri, näyttö, root ja HistoryDetailView
+    // (Palvelupisteiden tiedot tietokannasta)
+
     private IKontrolleriForV kontrolleri;
-
-    // Heitin root borderpanen tänne, käytän sitä useammassa metodissa
+    private IVisualisointi naytto;
     private BorderPane root;
-
     private HistoryDetailView currentDetailView;
+
+
+    // Distribuution valitsemis constants
+    private GridPane distributionGrid;
+    private ComboBox<String>[] distributionTypes;
+    private TextField[] meanValues;
+    private TextField[] varianceValues;
+    private static final int SERVICE_POINTS = 4;
+
+    private static final String[] DISTRIBUTION_TYPES = {
+            "Normal",
+            "Negative Exponential",
+            "Uniform",
+            "Binomial",
+            "Poisson"
+    };
 
 
     // Käyttöliittymäkomponentit:
     private TextField aika;
     private TextField viive;
+    private TextField arrivalProbField;
+    private TextField redirectProbField;
     private Label tulos;
     private Label palvellutAsiakasMaara;
     private Label aikaLabel;
@@ -117,11 +136,10 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private Button stopButton;
     private Button newSimButton;
 
-
-    private IVisualisointi naytto;
-
     private static final int WIDTH = 1024;
     private static final int HEIGHT = 768;
+    private static final double GRID_SPACING = 5;
+    private static final double OPACITY = 0.8;
 
 
     @Override
@@ -150,47 +168,39 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             primaryStage.setWidth(WIDTH);
             primaryStage.setHeight(HEIGHT);
 
-            kaynnistaButton = new Button();
-            kaynnistaButton.setText("Käynnistä simulointi");
-            kaynnistaButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    kontrolleri.kaynnistaSimulointi();
-                    kaynnistaButton.setDisable(true);
-                }
+            kaynnistaButton = createButton("Käynnistä simulointi", event -> {
+                kontrolleri.kaynnistaSimulointi();
+                kaynnistaButton.setDisable(true);
+            });
+            hidastaButton = createButton("Hidasta", e -> kontrolleri.hidasta());
+            nopeutaButton = createButton("Nopeuta", e -> kontrolleri.nopeuta());
+
+            jatkaButton = createButton("Continue", e -> {
+                kontrolleri.jatka();
+                naytto.resumeAnimation();  // Use the visualization's resume method
+                jatkaButton.setDisable(true);
+                pysaytaButton.setDisable(false);
             });
 
-            hidastaButton = new Button();
-            hidastaButton.setText("Hidasta");
-            hidastaButton.setOnAction(e -> kontrolleri.hidasta());
+            pysaytaButton = createButton("Pause", e -> {
+                kontrolleri.pysayta();
+                naytto.pauseAnimation();  // Use the visualization's pause method
+                pysaytaButton.setDisable(true);
+                jatkaButton.setDisable(false);
+            });
 
-            nopeutaButton = new Button();
-            nopeutaButton.setText("Nopeuta");
-            nopeutaButton.setOnAction(e -> kontrolleri.nopeuta());
-
-            jatkaButton = new Button();
-            jatkaButton.setText("Jatka");
-            jatkaButton.setOnAction(e -> kontrolleri.jatka());
-
-            pysaytaButton = new Button();
-            pysaytaButton.setText("Pysäytä");
-            pysaytaButton.setOnAction(e -> kontrolleri.pysayta());
-
-            setButton = new Button();
-            setButton.setText("Set");
-            setButton.setOnAction(e-> kontrolleri.set());
-
-            historyButton = new Button();
-            historyButton.setText("History");
-            historyButton.setOnAction(e-> kontrolleri.naytaHistoriaData());
+            setButton = createButton("Set", e -> kontrolleri.set());
+            historyButton = createButton("History", e -> kontrolleri.naytaHistoriaData());
 
             stopButton = new Button();
             stopButton.setText("Stop Sim");
             stopButton.setOnAction(e-> kontrolleri.stopSim());
 
-            newSimButton = new Button();
-            newSimButton.setText("New Sim");
-            newSimButton.setOnAction(e->kontrolleri.kaynnistaSimulointi());
+            newSimButton = new Button("New Sim");
+            newSimButton.setOnAction(e -> {
+                kontrolleri.stopSim(); // Stop current simulation
+                resetSimulation();     // Reset UI and visualization
+            });
 
             aikaLabel = new Label("Simulointiaika:");
             aikaLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 13));
@@ -395,124 +405,36 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             root.setBackground(new Background(background));
             root.setPadding(new Insets(4,1, 0, 1)); // margins top, right, bottom, left
 
-            VBox labelBox = new VBox();
-            labelBox.setSpacing(10);   // spacing between nodes 10 pixels
+            // Create ScrollPane for left panel
+            ScrollPane leftScroll = new ScrollPane();
+            leftScroll.setFitToWidth(true);
+            leftScroll.setPrefViewportWidth(450);
+            leftScroll.setMaxHeight(HEIGHT);
+            leftScroll.setStyle("-fx-background: #ffa500;");
 
-            GridPane grid = new GridPane();
-            grid.setPadding(new Insets(5, 5, 5, 5)); // margins top, right, bottom, left
-            grid.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
-            grid.setAlignment(Pos.CENTER_LEFT);
-            grid.setOpacity(0.8);
-            grid.setVgap(5);
+            // Create a main VBox for the left side that will contain both distribution controls and info grid
+            VBox leftPanel = new VBox(10);
 
+            distributionGrid = createDistributionGrid();
 
+            // Add distribution grid and info grid to left panel
+            leftPanel.getChildren().add(distributionGrid);
+            leftPanel.getChildren().add(createInfoGrid());
 
-            // Column constraints
-            ColumnConstraints column1 = new ColumnConstraints();
-            ColumnConstraints column2 = new ColumnConstraints();
-            grid.getColumnConstraints().addAll(column1, column2);
-            column1.setPercentWidth(50);
-            column2.setPercentWidth(50);
+            // Set left panel as ScrollPane content
+            leftScroll.setContent(leftPanel);
 
-            // Horizontal alignment
-            //grid.setGridLinesVisible(true);
-
-            grid.add(aikaLabel, 0, 0);   // sarake, rivi
-            grid.add(aika, 1, 0);
-            grid.add(viiveLabel, 0, 1);
-            grid.add(viive, 1, 1);
-            grid.add(tulosLabel, 0, 2);
-            grid.add(tulos, 1, 2);
-            grid.add(palvellutLabel, 0, 3);
-            grid.add(palvellutAsiakasMaara, 1, 3);
-
-            ikaKeskPalveluaika.setPrefWidth(300);
-            grid.add(ikaKeskPalveluaika, 0, 4,2,1);
-            grid.add(ikaNuori, 0, 5);
-            grid.add(tulosIkaNuori, 1, 5);
-            grid.add(ikaKeski, 0, 6);
-            grid.add(tulosIkaKeski, 1, 6);
-            grid.add(ikaVanha, 0, 7);
-            grid.add(tulosIkaVanha, 1, 7);
-
-            // PAKETTIAUTOMAATTI
-            grid.add(palvelunValintaLabel,0,8,2,1);
-            palvelunValintaLabel.setPrefWidth(300);
-            grid.add(jonossaLabel,0,9);
-            grid.add(jonossa,1,9);
-            grid.add(palveluMaaraLabel,0,10);
-            grid.add(palveluMaara,1,10);
-            grid.add(keskimJonoAikaLabel,0,11);
-            grid.add(keskimJonoAika,1,11);
-            grid.add(keskimPalveluAikaLabel,0,12);
-            grid.add(keskimPalveluAika,1,12);
-            grid.add(kokonaisAikaLabel,0,13);
-            grid.add(kokonaisAika,1,13);
-
-            // PALVELUNVALINTA
-            grid.add(PVpalvelunValintaLabel,0,14,2,1);
-            PVpalvelunValintaLabel.setPrefWidth(300);
-            grid.add(PVjonossaLabel,0,15);
-            grid.add(PVjonossa,1,15);
-            grid.add(PVpalveluMaaraLabel,0,16);
-            grid.add(PVpalveluMaara,1,16);
-            grid.add(PVkeskimJonoAikaLabel,0,17);
-            grid.add(PVkeskimJonoAika,1,17);
-            grid.add(PVkeskimPalveluAikaLabel,0,18);
-            grid.add(PVkeskimPalveluAika,1,18);
-            grid.add(PVkokonaisAikaLabel,0,19);
-            grid.add(PVkokonaisAika,1,19);
-
-            // NOUTOLÄHETÄ
-            grid.add(NTpalvelunValintaLabel,0,20,2,1);
-            NTpalvelunValintaLabel.setPrefWidth(300);
-            grid.add(NTjonossaLabel,0,21);
-            grid.add(NTjonossa,1,21);
-            grid.add(NTpalveluMaaraLabel,0,22);
-            grid.add(NTpalveluMaara,1,22);
-            grid.add(NTkeskimJonoAikaLabel,0,23);
-            grid.add(NTkeskimJonoAika,1,23);
-            grid.add(NTkeskimPalveluAikaLabel,0,24);
-            grid.add(NTkeskimPalveluAika,1,24);
-            grid.add(NTkokonaisAikaLabel,0,25);
-            grid.add(NTkokonaisAika,1,25);
-
-            // ERITYISTAPAUKSET
-            grid.add(ETpalvelunValintaLabel,0,26,2,1);
-            ETpalvelunValintaLabel.setPrefWidth(300);
-            grid.add(ETjonossaLabel,0,27);
-            grid.add(ETjonossa,1,27);
-            grid.add(ETpalveluMaaraLabel,0,28);
-            grid.add(ETpalveluMaara,1,28);
-            grid.add(ETkeskimJonoAikaLabel,0,29);
-            grid.add(ETkeskimJonoAika,1,29);
-            grid.add(ETkeskimPalveluAikaLabel,0,30);
-            grid.add(ETkeskimPalveluAika,1,30);
-            grid.add(ETkokonaisAikaLabel,0,31);
-            grid.add(ETkokonaisAika,1,31);
-
-
-            labelBox.getChildren().add(grid);
-
+            // Set up the rest of the UI
             naytto = new Visualisointi(309, 200, root);
-
-            // Canvas skaalaus ei toimi vielä kunnolla !!
             Canvas canvas = (Canvas) naytto;
-            canvas.widthProperty().bind(root.widthProperty().subtract(labelBox.widthProperty()).subtract(20));
-            canvas.heightProperty().bind(root.heightProperty().subtract(70)); // Adjusted height binding
+            canvas.widthProperty().bind(root.widthProperty().subtract(leftPanel.widthProperty()).subtract(40));  // Increased padding
+            canvas.heightProperty().bind(root.heightProperty().subtract(100));
 
+            // Create button box
+            HBox buttonBox = createButtonBox();
 
-            // HBox painikkeille
-            HBox buttonBox = new HBox();
-            buttonBox.setAlignment(Pos.BOTTOM_CENTER);
-            buttonBox.setSpacing(10); // spacing between buttons
-            buttonBox.setPadding(new Insets(15, 12, 15, 12)); // margins top, right, bottom, left
-            buttonBox.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton, jatkaButton, pysaytaButton, setButton, historyButton, stopButton, newSimButton);
-            buttonBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
-            buttonBox.setOpacity(0.8);
-
-            // BorderPanen asettelu
-            root.setLeft(labelBox);
+            // Add all components to root
+            root.setLeft(leftScroll);
             root.setCenter(canvas);
             root.setBottom(buttonBox);
 
@@ -526,35 +448,198 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
     }
 
+    // Tässä on helper metodeja ja historiaikkunan luonti alkuun
+    // Ei käytetä rajapinnassa
 
-    //Käyttöliittymän rajapintametodit (kutsutaan kontrollerista)
+    private GridPane createDistributionGrid() {
+        GridPane distributionGrid = new GridPane();
+        distributionGrid.setHgap(5);
+        distributionGrid.setVgap(5);
+        distributionGrid.setPadding(new Insets(5));
+        distributionGrid.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+        distributionGrid.setOpacity(OPACITY);
 
-    @Override
-    public void naytaHistoriaData(List<Tulokset> data) {
+        // Add arrival probability input
+        Label probLabel = new Label("Todennäköisyys\npakettiautomaatille (0-1):");
+        probLabel.setWrapText(true);
+        probLabel.setMaxWidth(200);
+        arrivalProbField = new TextField("0.5");
+        arrivalProbField.setPrefWidth(60);
+        distributionGrid.add(probLabel, 0, 0, 2, 1);
+        distributionGrid.add(arrivalProbField, 2, 0, 2, 1);
+
+        // Add redirect probability input
+        Label redirectLabel = new Label("Todennäköisyys\npalvelupisteelle nouto/lähetä (0-1):");
+        redirectLabel.setWrapText(true);
+        redirectLabel.setMaxWidth(200);
+        redirectProbField = new TextField("0.5");
+        redirectProbField.setPrefWidth(60);
+        distributionGrid.add(redirectLabel, 0, 1, 2, 1);
+        distributionGrid.add(redirectProbField, 2, 1, 2, 1);
+
+        // Initialize distribution controls
+        distributionTypes = new ComboBox[SERVICE_POINTS];
+        meanValues = new TextField[SERVICE_POINTS];
+        varianceValues = new TextField[SERVICE_POINTS];
+
+        String[] labels = {"Pakettiautomaatti", "Palvelunvalinta", "Nouto/Lähetä", "Erityistapaukset"};
+
+        for (int i = 0; i < SERVICE_POINTS; i++) {
+            distributionGrid.add(new Label(labels[i]), 0, i + 2); // Shifted down by 1
+
+            distributionTypes[i] = new ComboBox<>();
+            distributionTypes[i].getItems().addAll(DISTRIBUTION_TYPES);
+            distributionTypes[i].setValue(DISTRIBUTION_TYPES[0]);
+            distributionTypes[i].setPrefWidth(100);
+            distributionGrid.add(distributionTypes[i], 1, i + 2);
+
+            meanValues[i] = new TextField("5.0");
+            meanValues[i].setPrefWidth(60);
+            Label meanLabel = new Label("Mean:");
+            meanLabel.setMinWidth(35);
+            distributionGrid.add(meanLabel, 2, i + 2);
+            distributionGrid.add(meanValues[i], 3, i + 2);
+
+            varianceValues[i] = new TextField("2.0");
+            varianceValues[i].setPrefWidth(60);
+            Label varLabel = new Label("Var:");
+            varLabel.setMinWidth(25);
+            distributionGrid.add(varLabel, 4, i + 2);
+            distributionGrid.add(varianceValues[i], 5, i + 2);
+        }
+
+        return distributionGrid;
+    }
+
+    private HBox createButtonBox() {
+        HBox buttonBox = new HBox();
+        buttonBox.setAlignment(Pos.BOTTOM_CENTER);
+        buttonBox.setSpacing(15); // Increased spacing
+        buttonBox.setPadding(new Insets(15));
+
+        // Main simulation controls group
+        HBox simControls = new HBox(10);
+        simControls.getChildren().addAll(kaynnistaButton, nopeutaButton, hidastaButton,
+                jatkaButton, pysaytaButton);
+
+        // Utility controls group
+        HBox utilityControls = new HBox(10);
+        utilityControls.getChildren().addAll(setButton, historyButton);
+
+        // Reset controls group
+        HBox resetControls = new HBox(10);
+        resetControls.getChildren().addAll(stopButton, newSimButton);
+
+        // Add tooltips
+        kaynnistaButton.setTooltip(new Tooltip("Start the simulation"));
+        nopeutaButton.setTooltip(new Tooltip("Increase simulation speed"));
+        hidastaButton.setTooltip(new Tooltip("Decrease simulation speed"));
+        jatkaButton.setTooltip(new Tooltip("Continue paused simulation"));
+        pysaytaButton.setTooltip(new Tooltip("Pause simulation"));
+        setButton.setTooltip(new Tooltip("Apply settings"));
+        historyButton.setTooltip(new Tooltip("View simulation history"));
+        stopButton.setTooltip(new Tooltip("Stop current simulation"));
+        newSimButton.setTooltip(new Tooltip("Start a new simulation"));
+
+        // Style buttons
+        String buttonStyle = "-fx-font-size: 12px; -fx-min-width: 80px;";
+        kaynnistaButton.setStyle(buttonStyle);
+        nopeutaButton.setStyle(buttonStyle);
+        hidastaButton.setStyle(buttonStyle);
+        jatkaButton.setStyle(buttonStyle);
+        pysaytaButton.setStyle(buttonStyle);
+        setButton.setStyle(buttonStyle);
+        historyButton.setStyle(buttonStyle);
+        stopButton.setStyle(buttonStyle);
+        newSimButton.setStyle(buttonStyle);
+
+        // Add separators between groups
+        buttonBox.getChildren().addAll(
+                simControls,
+                new Separator(Orientation.VERTICAL),
+                utilityControls,
+                new Separator(Orientation.VERTICAL),
+                resetControls
+        );
+
+        buttonBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+        buttonBox.setOpacity(0.8);
+        return buttonBox;
+    }
+
+    // Metodi luo napin ja asettaa sille tapahtumankäsittelijän
+    private Button createButton(String text, EventHandler<ActionEvent> handler) {
+        Button button = new Button(text);
+        button.setOnAction(handler);
+        return button;
+    }
+
+    private void resetSimulation() {
+
+        // Reset clock
         Platform.runLater(() -> {
-            if (data != null) {
-                TableView<Tulokset> table = createHistoryTable();
-                table.getItems().clear();
-                table.getItems().addAll(data);
-                showHistoryDialog(table);
-            }
+            kontrolleri.resetClock();  // Add this method to your controller interface
+        });
+
+        // Clear visualization
+        naytto.cleanUp();
+
+        // Reset all labels
+        Platform.runLater(() -> {
+            tulos.setText("");
+            palvellutAsiakasMaara.setText("");
+            tulosIkaNuori.setText("");
+            tulosIkaKeski.setText("");
+            tulosIkaVanha.setText("");
+            jonossa.setText("");
+            palveluMaara.setText("");
+            keskimJonoAika.setText("");
+            keskimPalveluAika.setText("");
+            kokonaisAika.setText("");
+            PVjonossa.setText("");
+            PVpalveluMaara.setText("");
+            PVkeskimJonoAika.setText("");
+            PVkeskimPalveluAika.setText("");
+            PVkokonaisAika.setText("");
+            NTjonossa.setText("");
+            NTpalveluMaara.setText("");
+            NTkeskimJonoAika.setText("");
+            NTkeskimPalveluAika.setText("");
+            NTkokonaisAika.setText("");
+            ETjonossa.setText("");
+            ETpalveluMaara.setText("");
+            ETkeskimJonoAika.setText("");
+            ETkeskimPalveluAika.setText("");
+            ETkokonaisAika.setText("");
+
+            // Re-enable start button
+            kaynnistaButton.setDisable(false);
         });
     }
 
-    @Override
-    public void paivitaHistoriaYksityiskohdat(Tulokset tulos) {
-        Platform.runLater(() -> {
-            if (currentDetailView != null && tulos != null) {
-                currentDetailView.updateDetails(tulos);
-            }
-        });
-    }
-
+    // Metodi luo historiatietojen näyttöikkunan
     private void showHistoryDialog(TableView<Tulokset> table) {
         try {
             Stage historyStage = new Stage();
             historyStage.initModality(Modality.APPLICATION_MODAL);
             historyStage.setTitle("Simulation History");
+
+            // Clear History button
+            Button clearButton = new Button("Clear History");
+            clearButton.setOnAction(e -> {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Clear History");
+                alert.setHeaderText("Clear All History");
+                alert.setContentText("Are you sure you want to clear all simulation history? This cannot be undone.");
+
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        kontrolleri.clearHistory();
+                        table.getItems().clear();
+                    }
+                });
+            });
+
             // Details panel
             currentDetailView = new HistoryDetailView();
             ScrollPane scrollPane = new ScrollPane(currentDetailView);
@@ -580,20 +665,22 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                 }
             });
 
-            // Layout
-            HBox bottomButtonBox = new HBox();
-            bottomButtonBox.setAlignment(Pos.BOTTOM_RIGHT);
-            bottomButtonBox.setSpacing(10);
-            bottomButtonBox.getChildren().add(deleteButton);
+            // Layout with clear button
+            VBox rightPanel = new VBox(10);
+            rightPanel.setPadding(new Insets(10));
 
-            SplitPane splitPane = new SplitPane(table, scrollPane);
+            // Create a HBox for buttons
+            HBox buttonBox = new HBox(10);
+            buttonBox.getChildren().addAll(clearButton, deleteButton);
+
+            // Add button box and scrollPane to rightPanel
+            rightPanel.getChildren().addAll(buttonBox, scrollPane);
+
+            // Split pane
+            SplitPane splitPane = new SplitPane(table, rightPanel);
             splitPane.setDividerPositions(0.6);
 
-            BorderPane dialogLayout = new BorderPane();
-            dialogLayout.setCenter(splitPane);
-            dialogLayout.setBottom(bottomButtonBox);
-
-            Scene scene = new Scene(dialogLayout, 1200, 600);
+            Scene scene = new Scene(splitPane, 1200, 600);
             historyStage.setScene(scene);
 
             // Clear reference when closing
@@ -605,21 +692,183 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
     }
 
+    // Metodi luo historiatietojen taulukon
     private TableView<Tulokset> createHistoryTable() {
         TableView<Tulokset> table = new TableView<>();
         table.setMinWidth(800);
 
         TableColumn<Tulokset, Integer> idCol = new TableColumn<>("ID");
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-
         TableColumn<Tulokset, Double> timeCol = new TableColumn<>("Kokonaisaika");
-        timeCol.setCellValueFactory(new PropertyValueFactory<>("kokonaisaika"));
-
         TableColumn<Tulokset, Integer> servedCol = new TableColumn<>("Palveltu");
-        servedCol.setCellValueFactory(new PropertyValueFactory<>("palveltu"));
+        TableColumn<Tulokset, Double> bernoulliArrival = new TableColumn<>("Todennäköisyys pakettiautomaatille");
+        TableColumn<Tulokset, Double> bernoulliRedirect = new TableColumn<>("Todennäköisyys nouto/lähetä");
+        TableColumn<Tulokset, Double> inputAika = new TableColumn<>("Syötetty Aika");
+        TableColumn<Tulokset, Long> inputViive = new TableColumn<>("Syötetty Viive");
 
-        table.getColumns().addAll(idCol, timeCol, servedCol);
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        timeCol.setCellValueFactory(new PropertyValueFactory<>("kokonaisaika"));
+        servedCol.setCellValueFactory(new PropertyValueFactory<>("palveltu"));
+        bernoulliArrival.setCellValueFactory(new PropertyValueFactory<>("bernoulliArrival"));
+        bernoulliRedirect.setCellValueFactory(new PropertyValueFactory<>("bernoulliRedirect"));
+        inputAika.setCellValueFactory(new PropertyValueFactory<>("inputAika"));
+        inputViive.setCellValueFactory(new PropertyValueFactory<>("inputViive"));
+
+        table.getColumns().addAll(idCol, timeCol, servedCol, bernoulliArrival, bernoulliRedirect, inputAika, inputViive);
         return table;
+    }
+
+    // Metodi luo gridin täällä jota kutsutaan start metodissa
+    private GridPane createInfoGrid() {
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(5));
+        grid.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+        grid.setAlignment(Pos.CENTER_LEFT);
+        grid.setOpacity(OPACITY);
+        grid.setVgap(GRID_SPACING);
+
+        // Column constraints
+        ColumnConstraints column1 = new ColumnConstraints();
+        ColumnConstraints column2 = new ColumnConstraints();
+        grid.getColumnConstraints().addAll(column1, column2);
+        column1.setPercentWidth(50);
+        column2.setPercentWidth(50);
+
+        addGeneralInfo(grid);
+        addAgeInfo(grid);
+        addServicePointInfo(grid);
+
+        return grid;
+    }
+
+    // Metodi jota käytetään start metodissa luomaan perustiedot
+    private void addGeneralInfo(GridPane grid) {
+        grid.add(aikaLabel, 0, 0);
+        grid.add(aika, 1, 0);
+        grid.add(viiveLabel, 0, 1);
+        grid.add(viive, 1, 1);
+        grid.add(tulosLabel, 0, 2);
+        grid.add(tulos, 1, 2);
+        grid.add(palvellutLabel, 0, 3);
+        grid.add(palvellutAsiakasMaara, 1, 3);
+    }
+
+    // Metodi jota käytetään start metodissa luomaan ikä tiedot
+    private void addAgeInfo(GridPane grid) {
+        ikaKeskPalveluaika.setPrefWidth(300);
+        grid.add(ikaKeskPalveluaika, 0, 4, 2, 1);
+        grid.add(ikaNuori, 0, 5);
+        grid.add(tulosIkaNuori, 1, 5);
+        grid.add(ikaKeski, 0, 6);
+        grid.add(tulosIkaKeski, 1, 6);
+        grid.add(ikaVanha, 0, 7);
+        grid.add(tulosIkaVanha, 1, 7);
+    }
+
+    // Metodi jota käytetään start metodissa palvelupisteiden tietoja varten
+    private void addServicePointInfo(GridPane grid) {
+        // PAKETTIAUTOMAATTI
+        addServicePointSection(grid, 8, palvelunValintaLabel, jonossaLabel, jonossa,
+                palveluMaaraLabel, palveluMaara, keskimJonoAikaLabel, keskimJonoAika,
+                keskimPalveluAikaLabel, keskimPalveluAika, kokonaisAikaLabel, kokonaisAika);
+
+        // PALVELUNVALINTA
+        addServicePointSection(grid, 14, PVpalvelunValintaLabel, PVjonossaLabel, PVjonossa,
+                PVpalveluMaaraLabel, PVpalveluMaara, PVkeskimJonoAikaLabel, PVkeskimJonoAika,
+                PVkeskimPalveluAikaLabel, PVkeskimPalveluAika, PVkokonaisAikaLabel, PVkokonaisAika);
+
+        // NOUTOLÄHETÄ
+        addServicePointSection(grid, 20, NTpalvelunValintaLabel, NTjonossaLabel, NTjonossa,
+                NTpalveluMaaraLabel, NTpalveluMaara, NTkeskimJonoAikaLabel, NTkeskimJonoAika,
+                NTkeskimPalveluAikaLabel, NTkeskimPalveluAika, NTkokonaisAikaLabel, NTkokonaisAika);
+
+        // ERIKOISTAPAUKSET
+        addServicePointSection(grid, 26, ETpalvelunValintaLabel, ETjonossaLabel, ETjonossa,
+                ETpalveluMaaraLabel, ETpalveluMaara, ETkeskimJonoAikaLabel, ETkeskimJonoAika,
+                ETkeskimPalveluAikaLabel, ETkeskimPalveluAika, ETkokonaisAikaLabel, ETkokonaisAika);
+    }
+
+    // Sama homma kun ylempi metodi
+    private void addServicePointSection(GridPane grid, int startRow, Label... labels) {
+        grid.add(labels[0], 0, startRow, 2, 1);
+        labels[0].setPrefWidth(300);
+
+        for (int i = 1; i < labels.length; i += 2) {
+            grid.add(labels[i], 0, startRow + (i + 1) / 2);
+            grid.add(labels[i + 1], 1, startRow + (i + 1) / 2);
+        }
+    }
+
+
+    //Käyttöliittymän rajapintametodit (kutsutaan kontrollerista)
+
+    @Override
+    public double getArrivalProbability() {
+        try {
+            double prob = Double.parseDouble(arrivalProbField.getText());
+            if (prob >= 0 && prob <= 1) {
+                return prob;
+            }
+        } catch (NumberFormatException e) {
+            // Ignore parse error
+        }
+        return 0.5; // Default value
+    }
+
+    @Override
+    public double getRedirectProbability() {
+        try {
+            double prob = Double.parseDouble(redirectProbField.getText());
+            if (prob >= 0 && prob <= 1) {
+                return prob;
+            }
+        } catch (NumberFormatException e) {
+            // Ignore parse error
+        }
+        return 0.5; // Default value
+    }
+
+    @Override
+    public String getDistributionType(int servicePoint) {
+        return distributionTypes[servicePoint].getValue();
+    }
+
+    @Override
+    public double getDistributionMean(int servicePoint) {
+        try {
+            return Double.parseDouble(meanValues[servicePoint].getText());
+        } catch (NumberFormatException e) {
+            return 5.0; // Default value
+        }
+    }
+
+    @Override
+    public double getDistributionVariance(int servicePoint) {
+        try {
+            return Double.parseDouble(varianceValues[servicePoint].getText());
+        } catch (NumberFormatException e) {
+            return 2.0; // Default value
+        }
+    }
+
+    @Override
+    public void naytaHistoriaData(List<Tulokset> data) {
+        Platform.runLater(() -> {
+            if (data != null) {
+                TableView<Tulokset> table = createHistoryTable();
+                table.getItems().clear();
+                table.getItems().addAll(data);
+                showHistoryDialog(table);
+            }
+        });
+    }
+
+    @Override
+    public void paivitaHistoriaYksityiskohdat(Tulokset tulos) {
+        Platform.runLater(() -> {
+            if (currentDetailView != null && tulos != null) {
+                currentDetailView.updateDetails(tulos);
+            }
+        });
     }
 
     @Override

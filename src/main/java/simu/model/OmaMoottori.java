@@ -1,13 +1,10 @@
 package simu.model;
 
 import controller.IKontrolleriForM;
-import dao.TuloksetDao;
+import eduni.distributions.*;
 import entity.*;
 import simu.framework.*;
-import eduni.distributions.Negexp;
-import eduni.distributions.Normal;
 
-import java.awt.geom.Point2D;
 import java.util.Random;
 
 public class OmaMoottori extends Moottori {
@@ -16,6 +13,11 @@ public class OmaMoottori extends Moottori {
 	private Palvelupiste[] palvelupisteet;
 	private Random random;
 	private int servedCustomers = 0;
+
+	private Bernoulli arrivalDistribution;
+	private Bernoulli redirectDistribution;
+	private double arrivalProbability;
+	private double redirectProbability;
 
 	private IDao tuloksetDao;
 	private Tulokset tulokset;
@@ -59,27 +61,50 @@ public class OmaMoottori extends Moottori {
 
 
 
-	public OmaMoottori(IKontrolleriForM kontrolleri) {
-		super (kontrolleri);
+	public OmaMoottori(IKontrolleriForM kontrolleri, IDao dao,
+					   String[] types, double[] means, double[] variances) {
+		super(kontrolleri, dao);
 
-		tuloksetDao = new TuloksetDao();
+		this.arrivalProbability = kontrolleri.getArrivalProbability();
+		this.redirectProbability = kontrolleri.getRedirectProbability();
+
+		this.arrivalDistribution = new Bernoulli(arrivalProbability);
+		this.redirectDistribution = new Bernoulli(redirectProbability);
+
+		tuloksetDao = dao;
 		palvelupisteet = new Palvelupiste[4];
 
 		// Initialize service points
-		palvelupisteet[0] = new Palvelupiste(new Normal(4, 3), tapahtumalista, TapahtumanTyyppi.PAKETTIAUTOMAATTI);
-		palvelupisteet[1] = new Palvelupiste(new Normal(2, 2), tapahtumalista, TapahtumanTyyppi.PALVELUNVALINTA);
-		palvelupisteet[2] = new Palvelupiste(new Normal(5, 4), tapahtumalista, TapahtumanTyyppi.NOUTOLAHETA);
-		palvelupisteet[3] = new Palvelupiste(new Normal(7, 4), tapahtumalista, TapahtumanTyyppi.ERITYISTAPAUKSET);
+		palvelupisteet[0] = new Palvelupiste(createDistribution(types[0], means[0], variances[0]),
+				tapahtumalista, TapahtumanTyyppi.PAKETTIAUTOMAATTI, types[0], means[0], variances[0]);
+		palvelupisteet[1] = new Palvelupiste(createDistribution(types[1], means[1], variances[1]),
+				tapahtumalista, TapahtumanTyyppi.PALVELUNVALINTA, types[1], means[1], variances[1]);
+		palvelupisteet[2] = new Palvelupiste(createDistribution(types[2], means[2], variances[2]),
+				tapahtumalista, TapahtumanTyyppi.NOUTOLAHETA, types[2], means[2], variances[2]);
+		palvelupisteet[3] = new Palvelupiste(createDistribution(types[3], means[3], variances[3]),
+				tapahtumalista, TapahtumanTyyppi.ERITYISTAPAUKSET, types[3], means[3], variances[3]);
+
 
 		saapumisprosessi = new Saapumisprosessi(new Negexp(15, 5), tapahtumalista, TapahtumanTyyppi.ARR1);
 		random = new Random();
 
+
+	}
+
+	private Generator createDistribution(String type, double mean, double variance) {
+		return switch (type) {
+			case "Normal" -> new Normal(mean, Math.sqrt(variance));
+			case "Negative Exponential" -> new Negexp(mean, 5);
+			case "Uniform" -> new Uniform(mean - variance, mean + variance);
+			case "Binomial" -> new Binomial(0.5, (int)mean); // Fix: probability first, then trials
+			case "Poisson" -> new Poisson(mean);
+			default -> new Normal(mean, Math.sqrt(variance));
+		};
 	}
 
 	@Override
 	protected void alustukset() {
 		saapumisprosessi.generoiSeuraava(); // First arrival in the system
-
 
 	}
 
@@ -120,8 +145,8 @@ public class OmaMoottori extends Moottori {
 	}
 
 	private void handleArrival(Asiakas a) {
-		double probability = getArrivalProbability(a);
-		if (random.nextDouble() < probability) {
+		// Bernoulli returns 1 with probability p, 0 with probability 1-p
+		if (arrivalDistribution.sample() == 1) {
 			palvelupisteet[0].lisaaJonoon(a); // Pakettiautomaatti
 			printArrival(a, "pakettiautomaatille");
 		} else {
@@ -130,23 +155,26 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
-	private double getArrivalProbability(Asiakas a) {
-		if (a.getAge() <= 40) return PROBABILITY_18TO40;
-		if (a.getAge() <= 60) return PROBABILITY_41TO60;
-		return PROBABILITY_60PLUS;
-	}
-
 	private void printArrival(Asiakas a, String servicePoint) {
 		System.out.println("Asiakas " + a.getId() + " saapui " + servicePoint + ".");
 	}
 
 	private void redirectToService(Asiakas a) {
-		if (random.nextBoolean()) {
-			palvelupisteet[2].lisaaJonoon(a); // Nouto/Lähetä
-			System.out.println("Asiakas " + a.getId() + " ohjattu nouto/lähetä palvelutiskille.");
+		ServicePoint next;
+
+		// Use redirectDistribution instead of random.nextBoolean()
+		if (redirectDistribution.sample() == 1) {
+			next = getServiceConfig(TapahtumanTyyppi.NOUTOLAHETA);
+			kontrolleri.moveCustomer(a.getId(), next.x(), next.y(), () -> {
+				palvelupisteet[2].lisaaJonoon(a);
+				System.out.println("Asiakas " + a.getId() + " ohjattu nouto/lähetä palvelutiskille.");
+			});
 		} else {
-			palvelupisteet[3].lisaaJonoon(a); // Erityistapaus
-			System.out.println("Asiakas " + a.getId() + " ohjattu erityistapaus palvelutiskille.");
+			next = getServiceConfig(TapahtumanTyyppi.ERITYISTAPAUKSET);
+			kontrolleri.moveCustomer(a.getId(), next.x(), next.y(), () -> {
+				palvelupisteet[3].lisaaJonoon(a);
+				System.out.println("Asiakas " + a.getId() + " ohjattu erityistapaus palvelutiskille.");
+			});
 		}
 	}
 
@@ -212,7 +240,10 @@ public class OmaMoottori extends Moottori {
 					palvelupisteet[0].getServedCustomers(),
 					palvelupisteet[0].getAverageWaitingTime(),
 					palvelupisteet[0].getAverageServiceTime(),
-					palvelupisteet[0].getTotalTime()
+					palvelupisteet[0].getTotalTime(),
+					palvelupisteet[0].getDistributionType(),
+					palvelupisteet[0].getDistributionMean(),
+					palvelupisteet[0].getDistributionVar()
 			);
 
 			PalvelunvalintaTulos pvTulos = new PalvelunvalintaTulos(
@@ -220,7 +251,10 @@ public class OmaMoottori extends Moottori {
 					palvelupisteet[1].getServedCustomers(),
 					palvelupisteet[1].getAverageWaitingTime(),
 					palvelupisteet[1].getAverageServiceTime(),
-					palvelupisteet[1].getTotalTime()
+					palvelupisteet[1].getTotalTime(),
+					palvelupisteet[1].getDistributionType(),
+					palvelupisteet[1].getDistributionMean(),
+					palvelupisteet[1].getDistributionVar()
 			);
 
 			NoutolahetaTulos nlTulos = new NoutolahetaTulos(
@@ -228,7 +262,10 @@ public class OmaMoottori extends Moottori {
 					palvelupisteet[2].getServedCustomers(),
 					palvelupisteet[2].getAverageWaitingTime(),
 					palvelupisteet[2].getAverageServiceTime(),
-					palvelupisteet[2].getTotalTime()
+					palvelupisteet[2].getTotalTime(),
+					palvelupisteet[2].getDistributionType(),
+					palvelupisteet[2].getDistributionMean(),
+					palvelupisteet[2].getDistributionVar()
 			);
 
 			ErityistapauksetTulos etTulos = new ErityistapauksetTulos(
@@ -236,9 +273,11 @@ public class OmaMoottori extends Moottori {
 					palvelupisteet[3].getServedCustomers(),
 					palvelupisteet[3].getAverageWaitingTime(),
 					palvelupisteet[3].getAverageServiceTime(),
-					palvelupisteet[3].getTotalTime()
+					palvelupisteet[3].getTotalTime(),
+					palvelupisteet[3].getDistributionType(),
+					palvelupisteet[3].getDistributionMean(),
+					palvelupisteet[3].getDistributionVar()
 			);
-
 			PalveluaikaIkaTulos ikaTulos = new PalveluaikaIkaTulos(
 					finalAvg18to40,
 					finalAvg41to60,
@@ -248,6 +287,10 @@ public class OmaMoottori extends Moottori {
 			this.tulokset = new Tulokset(
 					Kello.getInstance().getAika(),
 					servedCustomers,
+					arrivalProbability,      // bernoulliArrival
+					redirectProbability,     // bernoulliRedirect
+					kontrolleri.getAika(),   // inputAika
+					kontrolleri.getViive(),   // inputViive
 					nlTulos,
 					pvTulos,
 					paTulos,

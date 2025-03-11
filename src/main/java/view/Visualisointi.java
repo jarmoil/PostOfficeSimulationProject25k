@@ -1,6 +1,7 @@
 package view;
 
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -21,33 +22,47 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     private BorderPane root;
 
     // Lista varatuista sijainneista
-    private List<Point2D> occupiedPositions = new ArrayList<>();
+    private List<Point2D> occupiedPositions;
+    private final Object animationLock = new Object();
 
     // Asiakkaan koko, minimi välimatka kun luodaan asiakkaita, että ei mene päällekkäin jne.
     private static final double CUSTOMER_RADIUS = 10;
     private static final double MIN_DISTANCE = 3 * CUSTOMER_RADIUS;
     private static final double areaWidth = 100;
     private static final double areaHeight = 100;
-    private Timeline timeline;
-
-    private int activeAnimations = 0;
+    private List<Timeline> activeAnimations = new ArrayList<>();  // Keep this one, remove the int version
+    private Timeline currentTimeline;  // For pause/resume functionality
     private Runnable completionCallback;
+
+
+    // Siirretty arvot tänne niin helppo muuttaa halutessaan
+    private static final double ANIMATION_DURATION = 1.0;
+    private static final int ANIMATION_FPS = 60;
+    private static final double FADE_DURATION = 400;
 
     public Visualisointi(int w, int h, BorderPane root) {
         super(w, h);
+        if (root == null) {
+            throw new IllegalArgumentException("Root cannot be null");
+        }
         this.root = root;
-        gc = this.getGraphicsContext2D();
-        tyhjennaNaytto();
-        visualisoiPalvelupisteet();
+        this.gc = this.getGraphicsContext2D();
+        this.occupiedPositions = new ArrayList<>();
 
-        // Bindataan canvaksen koko rootin kokoon
-        this.widthProperty().bind(root.widthProperty());
-        this.heightProperty().bind(root.heightProperty());
+        initializeCanvas();
+    }
 
-        // Canvaksen päivitystä kun muutetaan ikkunan kokoa
+    // Metodi joka alustaa canvaksen
+    private void initializeCanvas() {
+        widthProperty().bind(root.widthProperty());
+        heightProperty().bind(root.heightProperty());
+
         root.widthProperty().addListener((obs, oldVal, newVal) -> updateCanvas());
         root.heightProperty().addListener((obs, oldVal, newVal) -> updateCanvas());
+
+        updateCanvas();
     }
+
 
     // Canvaksen päivitys kun ikkunan kokoa muutetaan
     public void updateCanvas() {
@@ -128,13 +143,26 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     // Animaatio hommelit siirretty tänne
 
     @Override
-    public boolean isAnimating() {
-        return activeAnimations > 0;
-    }
+    public void cleanUp() {
+        Platform.runLater(() -> {
+            synchronized (animationLock) {
+                // Stop all active animations first
+                for (Timeline timeline : activeAnimations) {
+                    timeline.stop();
+                }
+                activeAnimations.clear();
 
-    @Override
-    public void onAllAnimationsComplete(Runnable callback) {
-        this.completionCallback = callback;
+                // Clear other state
+                root.getChildren().removeIf(node -> node instanceof Circle);
+                occupiedPositions.clear();
+                currentTimeline = null;
+                completionCallback = null;
+
+                // Redraw
+                tyhjennaNaytto();
+                visualisoiPalvelupisteet();
+            }
+        });
     }
 
     @Override
@@ -172,86 +200,123 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         root.getChildren().add(customer);
     }
 
+    // Pikku tälläne handleri jos asiakasta ei löydy (ei pitäisi tapahtua mutta kuiteski)
+    private void handleCustomerNotFound(int id) {
+        System.err.println("Customer with ID " + id + " not found");
+    }
+
+    // Animaatio asiakkaan liikuttamiseen siirretty omaan metodiin, koska paljon eri logiikkaa siinä
+    private void animateCustomer(Circle customer, double toX, double toY, boolean shouldFadeOut, Runnable onFinished) {
+        // Remove the starting position from occupied positions
+        occupiedPositions.remove(new Point2D(customer.getCenterX(), customer.getCenterY()));
+
+        double deltaX = toX - customer.getCenterX();
+        double deltaY = toY - customer.getCenterY();
+        int frames = (int) (ANIMATION_DURATION * ANIMATION_FPS);
+        double stepX = deltaX / frames;
+        double stepY = deltaY / frames;
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
+            customer.setCenterX(customer.getCenterX() + stepX);
+            customer.setCenterY(customer.getCenterY() + stepY);
+        }));
+        timeline.setCycleCount(frames);
+
+        currentTimeline = timeline;
+        activeAnimations.add(timeline);
+
+        timeline.setOnFinished(event -> {
+            activeAnimations.remove(timeline);
+            if (shouldFadeOut) {
+                fadeOutAndRemove(customer, onFinished);
+            } else {
+                finishAnimation(onFinished);
+            }
+        });
+        timeline.play();
+    }
+
+    // Fade animaatiolla ja asiakkaan poistamiselle oma metodi
+    private void fadeOutAndRemove(Circle customer, Runnable onFinished) {
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_DURATION), customer);
+        fadeTransition.setToValue(0);
+        fadeTransition.setOnFinished(e -> {
+            root.getChildren().remove(customer);
+            // Add this line to remove the position
+            occupiedPositions.remove(new Point2D(customer.getCenterX(), customer.getCenterY()));
+            finishAnimation(onFinished);
+        });
+        fadeTransition.play();
+    }
+
+    // Animaation lopetus
+    private void finishAnimation(Runnable onFinished) {
+        if (onFinished != null) {
+            onFinished.run();
+        }
+        if (activeAnimations.isEmpty() && completionCallback != null) {
+            completionCallback.run();
+            completionCallback = null;
+        }
+    }
+
+    @Override
+    public boolean isAnimating() {
+        synchronized (animationLock) {
+            return !activeAnimations.isEmpty();
+        }
+    }
+
+    @Override
+    public void onAllAnimationsComplete(Runnable callback) {
+        this.completionCallback = callback;
+    }
+
+
+    // Movecustomer ja exitcustomer hyödyntää uusia metodeja animaatiolle
+
     @Override
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
+        Platform.runLater(() -> {
+            Circle customer = (Circle) root.lookup("#customer-" + id);
+            if (customer != null) {
+                synchronized (animationLock) {
+                    animateCustomer(customer, toX, toY, false, onFinished);
+                }
+            } else {
+                handleCustomerNotFound(id);
+            }
+        });
+    }
+    @Override
+    public void exitCustomer(int id, double toX, double toY) {
         Circle customer = (Circle) root.lookup("#customer-" + id);
         if (customer != null) {
-            activeAnimations++;
-            Point2D oldPosition = new Point2D(customer.getCenterX(), customer.getCenterY());
-            occupiedPositions.remove(oldPosition);
-
-            double deltaX = toX - customer.getCenterX();
-            double deltaY = toY - customer.getCenterY();
-            double duration = 1.0;
-            int frames = (int) (duration * 60);
-            double stepX = deltaX / frames;
-            double stepY = deltaY / frames;
-
-            timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
-                customer.setCenterX(customer.getCenterX() + stepX);
-                customer.setCenterY(customer.getCenterY() + stepY);
-            }));
-            timeline.setCycleCount(frames);
-            timeline.setOnFinished(event -> {
-                onFinished.run();
-                activeAnimations--;
-                if (activeAnimations == 0 && completionCallback != null) {
-                    completionCallback.run();
-                    completionCallback = null;
-                }
-            });
-            timeline.play();
+            animateCustomer(customer, toX, toY, true, null);
+        } else {
+            handleCustomerNotFound(id);
         }
     }
 
     @Override
     public void pauseAnimation() {
-        if (timeline != null) {
-            timeline.pause();
-        }
+        Platform.runLater(() -> {
+            synchronized (animationLock) {
+                for (Timeline timeline : activeAnimations) {
+                    timeline.pause();
+                }
+            }
+        });
     }
 
     @Override
     public void resumeAnimation() {
-        if (timeline != null) {
-            timeline.play();
-        }
-    }
-
-    @Override
-    public void exitCustomer(int id, double toX, double toY) {
-        Circle customer = (Circle) root.lookup("#customer-" + id);
-        if (customer != null) {
-            activeAnimations++;
-            Point2D oldPosition = new Point2D(customer.getCenterX(), customer.getCenterY());
-            occupiedPositions.remove(oldPosition);
-
-            double deltaX = toX - customer.getCenterX();
-            double deltaY = toY - customer.getCenterY();
-            double duration = 1.0;
-            int frames = (int) (duration * 60);
-            double stepX = deltaX / frames;
-            double stepY = deltaY / frames;
-
-            timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
-                customer.setCenterX(customer.getCenterX() + stepX);
-                customer.setCenterY(customer.getCenterY() + stepY);
-            }));
-            timeline.setCycleCount(frames);
-            timeline.setOnFinished(event -> {
-                FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), customer);
-                fadeTransition.setToValue(0);
-                fadeTransition.setOnFinished(e -> {
-                    root.getChildren().remove(customer);
-                    activeAnimations--;
-                    if (activeAnimations == 0 && completionCallback != null) {
-                        completionCallback.run();
-                        completionCallback = null;
-                    }
-                });
-                fadeTransition.play();
-            });
-            timeline.play();
-        }
+        Platform.runLater(() -> {
+            synchronized (animationLock) {
+                for (Timeline timeline : activeAnimations) {
+                    timeline.play();
+                }
+            }
+        });
     }
 }

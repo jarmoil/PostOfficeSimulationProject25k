@@ -1,17 +1,25 @@
 package simu.model;
 
+import eduni.distributions.ContinuousGenerator;
+import eduni.distributions.DiscreteGenerator;
+import eduni.distributions.Generator;
 import simu.framework.*;
 import java.util.LinkedList;
 import java.util.Random;
 
-import eduni.distributions.ContinuousGenerator;
 
 // TODO:
 // Palvelupistekohtaiset toiminnallisuudet, laskutoimitukset (+ tarvittavat muuttujat) ja raportointi koodattava
 public class Palvelupiste {
+	private ContinuousGenerator continuousGenerator;
+	private DiscreteGenerator discreteGenerator;
+	private boolean isDiscrete;
+
+	private String distributionType;
+	private double distributionMean;
+	private double distributionVar;
 
 	private final LinkedList<Asiakas> jono = new LinkedList<>(); // Tietorakennetoteutus
-	private final ContinuousGenerator generator;
 	private final Tapahtumalista tapahtumalista;
 	private final TapahtumanTyyppi skeduloitavanTapahtumanTyyppi;
 	
@@ -26,11 +34,21 @@ public class Palvelupiste {
 	private double totalTime = 0;
 
 
-	public Palvelupiste(ContinuousGenerator generator, Tapahtumalista tapahtumalista, TapahtumanTyyppi tyyppi){
+	public Palvelupiste(Generator generator, Tapahtumalista tapahtumalista,
+						TapahtumanTyyppi tyyppi, String distributionType,
+						double mean, double var) {
 		this.tapahtumalista = tapahtumalista;
-		this.generator = generator;
+		if (generator instanceof ContinuousGenerator) {
+			this.continuousGenerator = (ContinuousGenerator) generator;
+			this.isDiscrete = false;
+		} else {
+			this.discreteGenerator = (DiscreteGenerator) generator;
+			this.isDiscrete = true;
+		}
 		this.skeduloitavanTapahtumanTyyppi = tyyppi;
-				
+		this.distributionType = distributionType;
+		this.distributionMean = mean;
+		this.distributionVar = var;
 	}
 
 	public void lisaaJonoon(Asiakas a){   // Jonon 1. asiakas aina palvelussa
@@ -49,22 +67,28 @@ public class Palvelupiste {
 		return poistettava;
 	}
 
-	public void aloitaPalvelu(){  //Aloitetaan uusi palvelu, asiakas on jonossa palvelun aikana
+	public void aloitaPalvelu() {
 		if(jono.isEmpty()) return;
 
-
 		Asiakas asiakas = jono.peek();
-		double palveluaika = generator.sample() * checkAgeMultiplier(asiakas);
+		double palveluaika;
+
+		if (isDiscrete) {
+			palveluaika = discreteGenerator.sample() * checkAgeMultiplier(asiakas);
+		} else {
+			palveluaika = continuousGenerator.sample() * checkAgeMultiplier(asiakas);
+		}
+
 		double randomDelay = new Random().nextDouble() * 10;
 		overallWaitingTime += Kello.getInstance().getAika() - asiakas.getSaapumisaika() + randomDelay;
 		overallServiceTime += palveluaika;
-		
+
 		varattu = true;
-		tapahtumalista.lisaa(new Tapahtuma(skeduloitavanTapahtumanTyyppi,Kello.getInstance().getAika()+palveluaika+randomDelay));
+		tapahtumalista.lisaa(new Tapahtuma(skeduloitavanTapahtumanTyyppi,
+				Kello.getInstance().getAika() + palveluaika + randomDelay));
 
 		totalTime += palveluaika + randomDelay;
 		Trace.out(Trace.Level.INFO, "Aloitetaan uusi palvelu asiakkaalle " + jono.peek().getId());
-
 	}
 
 	// ikäluokkien kertoimet palveluajalle
@@ -87,6 +111,18 @@ public class Palvelupiste {
 	}
 
 	// Raportointi metodit
+
+	public String getDistributionType() {
+		return distributionType;
+	}
+
+	public double getDistributionMean() {
+		return distributionMean;
+	}
+
+	public double getDistributionVar() {
+		return distributionVar;
+	}
 
 	public double getAverageWaitingTime() {
 		return servedCustomers > 0 ? overallWaitingTime / servedCustomers : 0;
