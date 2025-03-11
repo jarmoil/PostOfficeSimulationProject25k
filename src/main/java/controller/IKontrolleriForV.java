@@ -23,4 +23,7 @@ public interface IKontrolleriForV {
     void clearHistory();
     // In IKontrolleriForV.java
     void resetClock();
+
+    double getAika();
+    long getViive();
 }
