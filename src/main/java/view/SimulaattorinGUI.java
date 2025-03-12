@@ -57,6 +57,13 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             "Binomial",
             "Poisson"
     };
+    private static final String[] TOOLTIP_TEXTS = {
+            "The normal distribution is a probability distribution that is symmetric about the mean,\n showing that data near the mean are more frequent in occurrence than data far from the mean.",
+            "Negative Exponential distribution: A continuous probability distribution.",
+            "A uniform distribution is a type of probability distribution where every possible outcome has an equal probability of occurring.\nThis means that all values within a given range are equally likely to be observed.",
+            "Binomial distribution: A discrete probability distribution.",
+            "The Poisson distribution is a type of discrete probability distribution that calculates the likelihood of \na certain number of events happening in a fixed time or space, assuming the events occur independently and at a constant rate."
+    };
 
 
     // Käyttöliittymäkomponentit:
@@ -498,6 +505,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             distributionTypes[i].getItems().addAll(DISTRIBUTION_TYPES);
             distributionTypes[i].setValue(DISTRIBUTION_TYPES[0]);
             distributionTypes[i].setPrefWidth(100);
+            setComboBoxTooltips(distributionTypes[i]);
             distributionGrid.add(distributionTypes[i], 1, i + 2);
 
             meanValues[i] = new TextField("5.0");
@@ -516,6 +524,26 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
 
         return distributionGrid;
+    }
+    // info boxit jakauman valinnalle
+    private void setComboBoxTooltips(ComboBox<String> comboBox) {
+        comboBox.setCellFactory(lv -> new ListCell<String>() {
+            private final Tooltip tooltip = new Tooltip();
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setTooltip(null);
+                } else {
+                    setText(item);
+                    int index = comboBox.getItems().indexOf(item);
+                    tooltip.setText(TOOLTIP_TEXTS[index]);
+                    setTooltip(tooltip);
+                }
+            }
+        });
     }
 
     private HBox createButtonBox() {
