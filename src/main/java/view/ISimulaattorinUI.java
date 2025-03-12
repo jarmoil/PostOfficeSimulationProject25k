@@ -57,6 +57,9 @@ public interface ISimulaattorinUI {
     double getArrivalProbability();
     double getRedirectProbability();
 
+    void disableInputFields();
+    void enableInputFields();
+
     // Kontrolleri tarvitsee
     public IVisualisointi getVisualisointi();
 }

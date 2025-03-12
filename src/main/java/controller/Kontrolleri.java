@@ -40,6 +40,7 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
         moottori.setViive(ui.getViive());
         ui.getVisualisointi().tyhjennaNaytto();
         ui.getVisualisointi().visualisoiPalvelupisteet();
+        ui.disableInputFields();
         ((Thread)moottori).start();
         //((Thread)moottori).run(); // Ei missään tapauksessa näin. Miksi?
     }
@@ -78,8 +79,6 @@ public class Kontrolleri implements IKontrolleriForM, IKontrolleriForV{   // UUS
             moottori.setViive(ui.getViive());
             ui.getVisualisointi().tyhjennaNaytto();
             ui.getVisualisointi().visualisoiPalvelupisteet();
-            Platform.runLater(() -> ui.getVisualisointi().pauseAnimation());
-
         }
     }
 

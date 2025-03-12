@@ -186,9 +186,24 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                     kaynnistaButton.setDisable(true);
                 }
             });
-            hidastaButton = createButton("Hidasta", e -> kontrolleri.hidasta());
-            nopeutaButton = createButton("Nopeuta", e -> kontrolleri.nopeuta());
 
+            hidastaButton = createButton("Hidasta", e -> {
+                kontrolleri.hidasta();
+                Platform.runLater(() -> {
+                    long currentViive = Long.parseLong(viive.getText());
+                    long newViive = (long)(currentViive * 1.10);
+                    viive.setText(String.valueOf(newViive));
+                });
+            });
+
+            nopeutaButton = createButton("Nopeuta", e -> {
+                kontrolleri.nopeuta();
+                Platform.runLater(() -> {
+                    long currentViive = Long.parseLong(viive.getText());
+                    long newViive = (long)(currentViive * 0.9);
+                    viive.setText(String.valueOf(newViive));
+                });
+            });
             jatkaButton = createButton("Continue", e -> {
                 kontrolleri.jatka();
                 naytto.resumeAnimation();  // Use the visualization's resume method
@@ -614,6 +629,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         // Reset clock
         Platform.runLater(() -> {
             kontrolleri.resetClock();  // Add this method to your controller interface
+            enableInputFields();
         });
 
         // Clear visualization
@@ -1068,6 +1084,22 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     public void ETpaivitaKokonaisAika(double totalTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.ETkokonaisAika.setText(formatter.format(totalTime));
+    }
+
+    @Override
+    public void disableInputFields() {
+        Platform.runLater(() -> {
+            aika.setDisable(true);
+            viive.setDisable(true);
+        });
+    }
+
+    @Override
+    public void enableInputFields() {
+        Platform.runLater(() -> {
+            aika.setDisable(false);
+            viive.setDisable(false);
+        });
     }
 
     @Override
