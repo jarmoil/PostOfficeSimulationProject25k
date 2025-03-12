@@ -57,6 +57,13 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             "Binomial",
             "Poisson"
     };
+    private static final String[] TOOLTIP_TEXTS = {
+            "The normal distribution is a probability distribution that is symmetric about the mean,\n showing that data near the mean are more frequent in occurrence than data far from the mean.",
+            "Negative Exponential distribution: A continuous probability distribution.",
+            "A uniform distribution is a type of probability distribution where every possible outcome has an equal probability of occurring.\nThis means that all values within a given range are equally likely to be observed.",
+            "Binomial distribution: A discrete probability distribution.",
+            "The Poisson distribution is a type of discrete probability distribution that calculates the likelihood of \na certain number of events happening in a fixed time or space, assuming the events occur independently and at a constant rate."
+    };
 
 
     // Käyttöliittymäkomponentit:
@@ -169,8 +176,15 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             primaryStage.setHeight(HEIGHT);
 
             kaynnistaButton = createButton("Käynnistä simulointi", event -> {
-                kontrolleri.kaynnistaSimulointi();
-                kaynnistaButton.setDisable(true);
+                double simulointiaika = kontrolleri.getAika();
+                long viive = kontrolleri.getViive();
+
+                if (simulointiaika <= 0 || viive <= 0) {
+                    showAlert("Simulointiaika and viive must be greater than 0. Please enter valid values.");
+                } else {
+                    kontrolleri.kaynnistaSimulointi();
+                    kaynnistaButton.setDisable(true);
+                }
             });
             hidastaButton = createButton("Hidasta", e -> kontrolleri.hidasta());
             nopeutaButton = createButton("Nopeuta", e -> kontrolleri.nopeuta());
@@ -491,6 +505,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             distributionTypes[i].getItems().addAll(DISTRIBUTION_TYPES);
             distributionTypes[i].setValue(DISTRIBUTION_TYPES[0]);
             distributionTypes[i].setPrefWidth(100);
+            setComboBoxTooltips(distributionTypes[i]);
             distributionGrid.add(distributionTypes[i], 1, i + 2);
 
             meanValues[i] = new TextField("5.0");
@@ -509,6 +524,26 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
 
         return distributionGrid;
+    }
+    // info boxit jakauman valinnalle
+    private void setComboBoxTooltips(ComboBox<String> comboBox) {
+        comboBox.setCellFactory(lv -> new ListCell<String>() {
+            private final Tooltip tooltip = new Tooltip();
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setTooltip(null);
+                } else {
+                    setText(item);
+                    int index = comboBox.getItems().indexOf(item);
+                    tooltip.setText(TOOLTIP_TEXTS[index]);
+                    setTooltip(tooltip);
+                }
+            }
+        });
     }
 
     private HBox createButtonBox() {
@@ -797,6 +832,13 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             grid.add(labels[i + 1], 1, startRow + (i + 1) / 2);
         }
     }
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Invalid Input");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
 
     //Käyttöliittymän rajapintametodit (kutsutaan kontrollerista)
@@ -809,7 +851,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                 return prob;
             }
         } catch (NumberFormatException e) {
-            // Ignore parse error
+            arrivalProbField.setText("0.5");
+            showAlert("Todennäköisyys pakettiautomaatille asetettu 0.5:ksi");
         }
         return 0.5; // Default value
     }
@@ -822,7 +865,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                 return prob;
             }
         } catch (NumberFormatException e) {
-            // Ignore parse error
+            redirectProbField.setText("0.5");
+            showAlert("Todennäköisyys palvelupisteelle asetettu 0.5:ksi");
         }
         return 0.5; // Default value
     }
@@ -831,12 +875,15 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     public String getDistributionType(int servicePoint) {
         return distributionTypes[servicePoint].getValue();
     }
+    String[] servicePointNames = {"Pakettiautomaatti", "Palvelunvalinta", "Nouto/Lähetä", "Erityistapaukset"};
 
     @Override
     public double getDistributionMean(int servicePoint) {
         try {
             return Double.parseDouble(meanValues[servicePoint].getText());
         } catch (NumberFormatException e) {
+            showAlert(servicePointNames[servicePoint] + " Mean asetettu 5:ksi");
+            meanValues[servicePoint].setText("5.0");
             return 5.0; // Default value
         }
     }
@@ -846,6 +893,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         try {
             return Double.parseDouble(varianceValues[servicePoint].getText());
         } catch (NumberFormatException e) {
+            showAlert(servicePointNames[servicePoint] + " Var asetettu 2:ksi");
+            varianceValues[servicePoint].setText("2.0");
             return 2.0; // Default value
         }
     }
@@ -873,12 +922,24 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
     @Override
     public double getAika() {
-        return Double.parseDouble(aika.getText());
+        String input = aika.getText();
+        try {
+            return Double.parseDouble(input);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid input for simulointiaika. Please enter a valid number.");
+            return 0;
+        }
     }
 
     @Override
     public long getViive() {
-        return Long.parseLong(viive.getText());
+        String input = viive.getText();
+        try {
+            return Long.parseLong(input);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid input for viive. Please enter a valid number.");
+        return 0;
+        }
     }
 
     @Override

@@ -1,6 +1,5 @@
 package view;
 
-
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
@@ -19,6 +18,13 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     private final GraphicsContext gc;
     private ISimulaattorinUI ui;
+    private Image entryImage;
+    private Image ntImage;
+    private Image etImage;
+    private Image pvImage;
+    private Image paImage;
+    private Image exitImage;
+
 
     // Heitin root borderpanen tänne, käytän sitä useammassa metodissa
     private BorderPane root;
@@ -53,8 +59,17 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         this.root = root;
         this.ui = ui;
         this.gc = this.getGraphicsContext2D();
+        loadImages();
 
         initializeCanvas();
+    }
+    private void loadImages() {
+        entryImage = new Image(getClass().getResourceAsStream("/entry.png"));
+        ntImage = new Image(getClass().getResourceAsStream("/serviceDesk.png"));
+        etImage = new Image(getClass().getResourceAsStream("/serviceDesk.png"));
+        pvImage = new Image(getClass().getResourceAsStream("/palvelunvalintanaytto.png"));
+        paImage = new Image(getClass().getResourceAsStream("/pakettiautomaatti.png"));
+        exitImage = new Image(getClass().getResourceAsStream("/exit.png"));
     }
 
     // Metodi joka alustaa canvaksen
@@ -91,8 +106,7 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     public void visualisoiAloitus() {
         gc.setFill(Color.BROWN);
-        gc.fillText("Aloitus", 0, (this.getHeight()/2) - 10);
-        gc.fillRect(0, (this.getHeight()/2), 100, 100);
+        gc.drawImage(entryImage, 0,this.getHeight()/2, 100, 80);
     }
     public Point2D AloitusCoord() {
         return new Point2D((root.getWidth()-this.getWidth()), ((root.getHeight()-this.getHeight()) + (this.getHeight()/2)-30));
@@ -100,9 +114,8 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     }
 
     public void visualisoiPA() {
-        gc.setFill(Color.BLACK);
+        gc.drawImage(paImage, (this.getWidth()/4), (this.getHeight()/3 + this.getHeight()/3), 100, 130);
         gc.fillText("Pakettiautomaatti", (this.getWidth()/4), (this.getHeight()/3 + this.getHeight()/3) - 10);
-        gc.fillRect((this.getWidth()/4), (this.getHeight()/3 + this.getHeight()/3), 50, 50);
     }
 
     public Point2D PACoord() {
@@ -110,36 +123,31 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     }
 
     public void visualisoiPV() {
-        gc.setFill(Color.BLACK);
+        gc.drawImage(pvImage, (this.getWidth()/4), (this.getHeight()/3), 100, 130);
         gc.fillText("Palvelunvalinta", (this.getWidth()/4), (this.getHeight()/3) - 10);
-        gc.fillRect((this.getWidth()/4), (this.getHeight()/3), 50, 50);
     }
     public Point2D PVCoord() {
         return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/4)) - CUSTOMER_RADIUS, ((root.getHeight() - this.getHeight()) + this.getHeight()/3) - 25);
     }
 
     public void visualisoiNT() {
-        gc.setFill(Color.BLACK);
-        gc.fillText("Nouto/Lähetä", (this.getWidth()/3), 60);
-        gc.fillRect((this.getWidth()/3), 0, 100, 50);
+        gc.drawImage(ntImage, (this.getWidth()/3), 0, 130, 80);
+        gc.fillText("Nouto/Lähetä", (this.getWidth()/3), 90);
     }
     public Point2D NTCoord() {
         return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/3)) + 50, (root.getHeight() - this.getHeight()));
     }
 
     public void visualisoiET() {
-        gc.setFill(Color.BLACK);
-        gc.fillText("Erikoistapaukset", (this.getWidth()/3 + this.getWidth()/3), 60);
-        gc.fillRect((this.getWidth()/3 + this.getWidth()/3), 0, 100, 50);
+        gc.drawImage(etImage, (this.getWidth()/3 + this.getWidth()/3), 0, 130, 80);
+        gc.fillText("Erikoistapaukset", (this.getWidth()/3 + this.getWidth()/3), 90);
     }
     public Point2D ETCoord() {
         return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/3) + (this.getWidth()/3)) + 50, (root.getHeight() - this.getHeight()));
     }
 
     public void visualisoiExit() {
-        gc.setFill(Color.RED);
-        gc.fillText("Exit", this.getWidth()-40, (this.getHeight()/2) - 10);
-        gc.fillRect(this.getWidth()-40, this.getHeight()/2, 40, 60);
+        gc.drawImage(exitImage, this.getWidth()-100, (this.getHeight()/2), 100, 80);
     }
     public Point2D ExitCoord() {
         return new Point2D((root.getWidth()-40), ((root.getHeight() - this.getHeight()) + (this.getHeight()/2)-30));
