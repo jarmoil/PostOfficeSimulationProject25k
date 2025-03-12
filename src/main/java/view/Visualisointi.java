@@ -106,7 +106,7 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     public void visualisoiAloitus() {
         gc.setFill(Color.BROWN);
-        gc.drawImage(entryImage, 0,this.getHeight()/2, 100, 80);
+        gc.drawImage(entryImage, 0,this.getHeight()/2, 100, 100);
     }
     public Point2D AloitusCoord() {
         return new Point2D((root.getWidth()-this.getWidth()), ((root.getHeight()-this.getHeight()) + (this.getHeight()/2)-30));
