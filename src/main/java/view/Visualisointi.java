@@ -1,33 +1,33 @@
 package view;
 
+
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Visualisointi extends Canvas implements IVisualisointi{
 
     private final GraphicsContext gc;
+    private ISimulaattorinUI ui;
 
     // Heitin root borderpanen tänne, käytän sitä useammassa metodissa
     private BorderPane root;
 
     // Lista varatuista sijainneista
-    private List<Point2D> occupiedPositions;
     private final Object animationLock = new Object();
 
     // Asiakkaan koko, minimi välimatka kun luodaan asiakkaita, että ei mene päällekkäin jne.
-    private static final double CUSTOMER_RADIUS = 10;
-    private static final double MIN_DISTANCE = 3 * CUSTOMER_RADIUS;
+    private static final double CUSTOMER_RADIUS = 30;
     private static final double areaWidth = 100;
     private static final double areaHeight = 100;
     private List<Timeline> activeAnimations = new ArrayList<>();  // Keep this one, remove the int version
@@ -36,18 +36,23 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
 
     // Siirretty arvot tänne niin helppo muuttaa halutessaan
-    private static final double ANIMATION_DURATION = 1.0;
     private static final int ANIMATION_FPS = 60;
     private static final double FADE_DURATION = 400;
 
-    public Visualisointi(int w, int h, BorderPane root) {
+    private static final Image CUSTOMER_IMAGE = new Image("/customer.png",
+            CUSTOMER_RADIUS * 2, CUSTOMER_RADIUS * 2, true, true);
+
+    public Visualisointi(int w, int h, BorderPane root, ISimulaattorinUI ui) {
         super(w, h);
         if (root == null) {
             throw new IllegalArgumentException("Root cannot be null");
         }
+        if (ui == null) {
+            throw new IllegalArgumentException("UI cannot be null");
+        }
         this.root = root;
+        this.ui = ui;
         this.gc = this.getGraphicsContext2D();
-        this.occupiedPositions = new ArrayList<>();
 
         initializeCanvas();
     }
@@ -61,6 +66,15 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         root.heightProperty().addListener((obs, oldVal, newVal) -> updateCanvas());
 
         updateCanvas();
+    }
+
+    private double getAnimationDuration() {
+        double currentViive = ui.getViive();
+        if (currentViive > 100) {
+            return 1.0; // Normal speed for viive > 200
+        }
+        // Scale down duration only for very fast speeds
+        return Math.max(0.2, currentViive / 200.0);
     }
 
 
@@ -78,7 +92,7 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     public void visualisoiAloitus() {
         gc.setFill(Color.BROWN);
         gc.fillText("Aloitus", 0, (this.getHeight()/2) - 10);
-        gc.fillRect(0, (this.getHeight()/2), 40, 60);
+        gc.fillRect(0, (this.getHeight()/2), 100, 100);
     }
     public Point2D AloitusCoord() {
         return new Point2D((root.getWidth()-this.getWidth()), ((root.getHeight()-this.getHeight()) + (this.getHeight()/2)-30));
@@ -146,19 +160,14 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     public void cleanUp() {
         Platform.runLater(() -> {
             synchronized (animationLock) {
-                // Stop all active animations first
                 for (Timeline timeline : activeAnimations) {
                     timeline.stop();
                 }
                 activeAnimations.clear();
-
-                // Clear other state
-                root.getChildren().removeIf(node -> node instanceof Circle);
-                occupiedPositions.clear();
+                root.getChildren().removeIf(node -> node instanceof ImageView);
                 currentTimeline = null;
                 completionCallback = null;
 
-                // Redraw
                 tyhjennaNaytto();
                 visualisoiPalvelupisteet();
             }
@@ -167,37 +176,23 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     @Override
     public void drawCustomer(int id, double areaX, double areaY) {
-        double x = areaX;
-        double y = areaY;
+        double x = areaX + (areaWidth - CUSTOMER_RADIUS * 2) / 2;
+        double y = areaY + Math.random() * (areaHeight - CUSTOMER_RADIUS * 2);
 
-        // Check for overlaps and adjust position if necessary
-        boolean overlap;
-        do {
-            overlap = false;
-            for (Point2D position : occupiedPositions) {
-                if (position.distance(x, y) < MIN_DISTANCE) {
-                    overlap = true;
-                    x += MIN_DISTANCE; // Adjust x position
-                    if (x > areaX + areaWidth - CUSTOMER_RADIUS) { // If x exceeds area width, reset x and adjust y
-                        x = areaX;
-                        y += MIN_DISTANCE;
-                    }
-                    if (y > areaY + areaHeight - CUSTOMER_RADIUS) { // If y exceeds area height, reset y
-                        y = areaY;
-                    }
-                    break;
-                }
-            }
-        } while (overlap);
-
-        // Add the new position to the list of occupied positions
-        occupiedPositions.add(new Point2D(x, y));
-
-        Circle customer = new Circle(CUSTOMER_RADIUS, Color.BLUE);
+        ImageView customer = new ImageView(CUSTOMER_IMAGE);
         customer.setId("customer-" + id);
-        customer.setCenterX(x);
-        customer.setCenterY(y);
+        customer.setX(x - CUSTOMER_RADIUS);
+        customer.setY(y - CUSTOMER_RADIUS);
+        customer.setStyle("-fx-background-color: transparent;");
+        customer.setOpacity(0); // Start fully transparent
+
         root.getChildren().add(customer);
+
+        // Create and play fade-in animation
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(FADE_DURATION), customer);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.play();
     }
 
     // Pikku tälläne handleri jos asiakasta ei löydy (ei pitäisi tapahtua mutta kuiteski)
@@ -206,19 +201,17 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     }
 
     // Animaatio asiakkaan liikuttamiseen siirretty omaan metodiin, koska paljon eri logiikkaa siinä
-    private void animateCustomer(Circle customer, double toX, double toY, boolean shouldFadeOut, Runnable onFinished) {
-        // Remove the starting position from occupied positions
-        occupiedPositions.remove(new Point2D(customer.getCenterX(), customer.getCenterY()));
+    private void animateCustomer(ImageView customer, double toX, double toY, boolean shouldFadeOut, Runnable onFinished) {
 
-        double deltaX = toX - customer.getCenterX();
-        double deltaY = toY - customer.getCenterY();
-        int frames = (int) (ANIMATION_DURATION * ANIMATION_FPS);
+        double deltaX = (toX - CUSTOMER_RADIUS) - customer.getX();
+        double deltaY = (toY - CUSTOMER_RADIUS) - customer.getY();
+        int frames = (int) (getAnimationDuration() * ANIMATION_FPS);
         double stepX = deltaX / frames;
         double stepY = deltaY / frames;
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
-            customer.setCenterX(customer.getCenterX() + stepX);
-            customer.setCenterY(customer.getCenterY() + stepY);
+            customer.setX(customer.getX() + stepX);
+            customer.setY(customer.getY() + stepY);
         }));
         timeline.setCycleCount(frames);
 
@@ -237,13 +230,11 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     }
 
     // Fade animaatiolla ja asiakkaan poistamiselle oma metodi
-    private void fadeOutAndRemove(Circle customer, Runnable onFinished) {
+    private void fadeOutAndRemove(ImageView customer, Runnable onFinished) {
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_DURATION), customer);
         fadeTransition.setToValue(0);
         fadeTransition.setOnFinished(e -> {
             root.getChildren().remove(customer);
-            // Add this line to remove the position
-            occupiedPositions.remove(new Point2D(customer.getCenterX(), customer.getCenterY()));
             finishAnimation(onFinished);
         });
         fadeTransition.play();
@@ -278,7 +269,7 @@ public class Visualisointi extends Canvas implements IVisualisointi{
     @Override
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
         Platform.runLater(() -> {
-            Circle customer = (Circle) root.lookup("#customer-" + id);
+            ImageView customer = (ImageView) root.lookup("#customer-" + id);
             if (customer != null) {
                 synchronized (animationLock) {
                     animateCustomer(customer, toX, toY, false, onFinished);
@@ -288,9 +279,10 @@ public class Visualisointi extends Canvas implements IVisualisointi{
             }
         });
     }
+
     @Override
     public void exitCustomer(int id, double toX, double toY) {
-        Circle customer = (Circle) root.lookup("#customer-" + id);
+        ImageView customer = (ImageView) root.lookup("#customer-" + id);
         if (customer != null) {
             animateCustomer(customer, toX, toY, true, null);
         } else {

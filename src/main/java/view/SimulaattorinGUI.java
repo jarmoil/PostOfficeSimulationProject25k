@@ -425,7 +425,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             leftScroll.setContent(leftPanel);
 
             // Set up the rest of the UI
-            naytto = new Visualisointi(309, 200, root);
+            naytto = new Visualisointi(309, 200, root, this);
             Canvas canvas = (Canvas) naytto;
             canvas.widthProperty().bind(root.widthProperty().subtract(leftPanel.widthProperty()).subtract(40));  // Increased padding
             canvas.heightProperty().bind(root.heightProperty().subtract(100));

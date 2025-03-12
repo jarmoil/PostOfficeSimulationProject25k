@@ -117,9 +117,9 @@ public class OmaMoottori extends Moottori {
 		switch (type) {
 			case ARR1 -> {
 				a = new Asiakas();
+				kontrolleri.drawCustomer(a.getId(), kontrolleri.AloitusCoord().getX(), kontrolleri.AloitusCoord().getY());
 				handleArrival(a);
 				saapumisprosessi.generoiSeuraava();
-				kontrolleri.drawCustomer(a.getId(), kontrolleri.AloitusCoord().getX(), kontrolleri.AloitusCoord().getY());
 			}
 			case PALVELUNVALINTA -> {
 				a = palvelupisteet[1].otaJonosta();
@@ -145,13 +145,20 @@ public class OmaMoottori extends Moottori {
 	}
 
 	private void handleArrival(Asiakas a) {
-		// Bernoulli returns 1 with probability p, 0 with probability 1-p
+		ServicePoint next;
+		// Use arrivalDistribution instead of random check
 		if (arrivalDistribution.sample() == 1) {
-			palvelupisteet[0].lisaaJonoon(a); // Pakettiautomaatti
-			printArrival(a, "pakettiautomaatille");
+			next = getServiceConfig(TapahtumanTyyppi.PAKETTIAUTOMAATTI);
+			kontrolleri.moveCustomer(a.getId(), next.x(), next.y(), () -> {
+				palvelupisteet[0].lisaaJonoon(a);
+				System.out.println("Asiakas " + a.getId() + " saapui pakettiautomaatille.");
+			});
 		} else {
-			palvelupisteet[1].lisaaJonoon(a); // Palvelun valinta
-			printArrival(a, "palvelunvalintaan");
+			next = getServiceConfig(TapahtumanTyyppi.PALVELUNVALINTA);
+			kontrolleri.moveCustomer(a.getId(), next.x(), next.y(), () -> {
+				palvelupisteet[1].lisaaJonoon(a);
+				System.out.println("Asiakas " + a.getId() + " saapui palvelunvalintaan.");
+			});
 		}
 	}
 
