@@ -7,6 +7,10 @@ import simu.framework.*;
 
 import java.util.Random;
 
+/**
+ * The OmaMoottori class extends Moottori and implements the simulation engine.
+ * It manages the arrival process, service points, and customer interactions within the simulation.
+ */
 public class OmaMoottori extends Moottori {
 
 	private Saapumisprosessi saapumisprosessi;
@@ -24,6 +28,12 @@ public class OmaMoottori extends Moottori {
 
 	private record ServicePoint(double x, double y, double exitX, double exitY) {}
 
+	/**
+	 * Returns the configuration for the specified service point type.
+	 * @param type The type of the service point.
+	 * @return The configuration for the service point, including coordinates for the service point and exit.
+	 * @throws IllegalArgumentException if the service point type is invalid.
+	 */
 	private ServicePoint getServiceConfig(TapahtumanTyyppi type) {
 		return switch (type) {
 			case PAKETTIAUTOMAATTI -> new ServicePoint(kontrolleri.PACoord().getX(), kontrolleri.PACoord().getY(), kontrolleri.ExitCoord().getX(), kontrolleri.ExitCoord().getY());
@@ -34,6 +44,10 @@ public class OmaMoottori extends Moottori {
 		};
 	}
 
+	/**
+	 * Updates the statistics for the specified service point.
+	 * @param p The service point whose statistics are to be updated.
+	 */
 	private void updateStats(Palvelupiste p) {
 
 		kontrolleri.updateServicePointStats(
@@ -60,7 +74,14 @@ public class OmaMoottori extends Moottori {
 	private static final double PROBABILITY_60PLUS = 0.1;
 
 
-
+	/**
+	 * Constructs a new OmaMoottori instance with the specified parameters.
+	 * @param kontrolleri The controller interface for the simulation.
+	 * @param dao The data access object for simulation results.
+	 * @param types The distribution types for the service points.
+	 * @param means The distribution means for the service points.
+	 * @param variances The distribution variances for the service points.
+	 */
 	public OmaMoottori(IKontrolleriForM kontrolleri, IDao dao,
 					   String[] types, double[] means, double[] variances) {
 		super(kontrolleri, dao);
@@ -91,6 +112,13 @@ public class OmaMoottori extends Moottori {
 
 	}
 
+	/**
+	 * Creates a distribution generator based on the specified type, mean, and variance.
+	 * @param type The distribution type.
+	 * @param mean The distribution mean.
+	 * @param variance The distribution variance.
+	 * @return The distribution generator.
+	 */
 	private Generator createDistribution(String type, double mean, double variance) {
 		return switch (type) {
 			case "Normal" -> new Normal(mean, Math.sqrt(variance));
@@ -102,12 +130,19 @@ public class OmaMoottori extends Moottori {
 		};
 	}
 
+	/**
+	 * Initializes the simulation by generating the first arrival event.
+	 */
 	@Override
 	protected void alustukset() {
 		saapumisprosessi.generoiSeuraava(); // First arrival in the system
 
 	}
 
+	/**
+	 * Executes the specified event within the simulation.
+	 * @param t The event to be executed.
+	 */
 	@Override
 	protected void suoritaTapahtuma(Tapahtuma t) {
 		Asiakas a;
@@ -144,6 +179,10 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
+	/**
+	 * Handles the arrival of a customer and directs them to the appropriate service point.
+	 * @param a The arriving customer.
+	 */
 	private void handleArrival(Asiakas a) {
 		ServicePoint next;
 		// Use arrivalDistribution instead of random check
@@ -166,6 +205,10 @@ public class OmaMoottori extends Moottori {
 		System.out.println("Asiakas " + a.getId() + " saapui " + servicePoint + ".");
 	}
 
+	/**
+	 * Redirects the customer to the appropriate service point based on the redirect probability.
+	 * @param a The customer to be redirected.
+	 */
 	private void redirectToService(Asiakas a) {
 		ServicePoint next;
 
@@ -185,6 +228,11 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
+	/**
+	 * Processes the customer at the specified service point and updates the service statistics.
+	 * @param a The customer to be processed.
+	 * @param p The service point where the customer is processed.
+	 */
 	private void processCustomer(Asiakas a, Palvelupiste p) {
 		a.setPoistumisaika(Kello.getInstance().getAika());
 		updateServiceTimeStats(a);
@@ -194,6 +242,10 @@ public class OmaMoottori extends Moottori {
 		a.raportti();
 	}
 
+	/**
+	 * Updates the service time statistics based on the customer's age group.
+	 * @param a The customer whose service time is being updated.
+	 */
 	// Update service time statistics based on age group
 	private void updateServiceTimeStats(Asiakas a) {
 		double serviceTime = a.getPoistumisaika() - a.getSaapumisaika();
@@ -212,6 +264,9 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
+	/**
+	 * Attempts to start service for customers at each service point if they are not currently occupied and have customers in the queue.
+	 */
 	@Override
 	protected void yritaCTapahtumat() {
 		for (Palvelupiste p : palvelupisteet) {
@@ -221,6 +276,9 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
+	/**
+	 * Collects and processes the final results of the simulation, including updating statistics and saving results to the database.
+	 */
 	@Override
 	protected void tulokset() {
 
@@ -316,6 +374,9 @@ public class OmaMoottori extends Moottori {
 		});
 		}
 
+	/**
+	 * Saves the simulation results to the database.
+	 */
 	public void tallennaTulokset() {
 		if (tulokset != null) {
 			tuloksetDao.tallenna(tulokset);
@@ -323,6 +384,10 @@ public class OmaMoottori extends Moottori {
 		}
 	}
 
+	/**
+	 * Prints the statistics for the specified service point.
+	 * @param p The service point whose statistics are to be printed.
+	 */
 	private void printServicePointStats(Palvelupiste p) {
 		System.out.println("\nPalvelupiste: " + p.getType());
 		System.out.println("  Jonossa asiakkaita: " + p.getQueueLength());
@@ -333,6 +398,9 @@ public class OmaMoottori extends Moottori {
 		System.out.println("--------------------------------");
 	}
 
+	/**
+	 * Prints the average service times by age group.
+	 */
 	private void printAverageServiceTimeByAge() {
 		System.out.println("\nAsiakkaiden keskimääräiset palveluajat iän mukaan:");
 		System.out.println("Ikä 18-40: " + (count18to40 > 0 ? totalServiceTime18to40 / count18to40 : 0));
