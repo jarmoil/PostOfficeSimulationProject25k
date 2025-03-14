@@ -31,7 +31,9 @@ import javafx.scene.layout.*;
 import javafx.scene.text.*;
 
 
-
+/**
+ * SimulaattorinGUI class handles the graphical user interface for the simulation.
+ */
 public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
     // Kontrolleri, näyttö, root ja HistoryDetailView
@@ -147,8 +149,9 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
     private static final int HEIGHT = 768;
     private static final double GRID_SPACING = 5;
     private static final double OPACITY = 0.8;
-
-
+    /**
+     * Initializes the controller and sets the trace level.
+     */
     @Override
     public void init() {
 
@@ -156,7 +159,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         TuloksetDao dao = new TuloksetDao();
         kontrolleri = new Kontrolleri(this, dao);
     }
-
+    /**
+     * Starts the application and sets up the user interface.
+     *
+     * @param primaryStage the primary stage for this application
+     */
     @Override
     public void start(Stage primaryStage) {
         // Käyttöliittymän rakentaminen
@@ -478,9 +485,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
     }
 
-    // Tässä on helper metodeja ja historiaikkunan luonti alkuun
-    // Ei käytetä rajapinnassa
-
+    /**
+     * Creates the distribution grid for the user interface.
+     *
+     * @return the created GridPane
+     */
     private GridPane createDistributionGrid() {
         GridPane distributionGrid = new GridPane();
         distributionGrid.setHgap(5);
@@ -541,7 +550,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
 
         return distributionGrid;
     }
-    // info boxit jakauman valinnalle
+    /**
+     * Sets tooltips for the distribution type ComboBox.
+     *
+     * @param comboBox the ComboBox to set tooltips for
+     */
     private void setComboBoxTooltips(ComboBox<String> comboBox) {
         comboBox.setCellFactory(lv -> new ListCell<String>() {
             private final Tooltip tooltip = new Tooltip();
@@ -561,7 +574,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             }
         });
     }
-
+    /**
+     * Creates the button box for the user interface.
+     *
+     * @return the created HBox
+     */
     private HBox createButtonBox() {
         HBox buttonBox = new HBox();
         buttonBox.setAlignment(Pos.BOTTOM_CENTER);
@@ -618,13 +635,21 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         return buttonBox;
     }
 
-    // Metodi luo napin ja asettaa sille tapahtumankäsittelijän
+    /**
+     * Creates a button with the specified text and event handler.
+     *
+     * @param text the text for the button
+     * @param handler the event handler for the button
+     * @return the created Button
+     */
     private Button createButton(String text, EventHandler<ActionEvent> handler) {
         Button button = new Button(text);
         button.setOnAction(handler);
         return button;
     }
-
+    /**
+     * Resets the simulation and updates the user interface.
+     */
     private void resetSimulation() {
 
         // Reset clock
@@ -669,7 +694,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         });
     }
 
-    // Metodi luo historiatietojen näyttöikkunan
+    /**
+     * Shows the history dialog with the provided table.
+     *
+     * @param table the TableView to display in the history dialog
+     */
     private void showHistoryDialog(TableView<Tulokset> table) {
         try {
             Stage historyStage = new Stage();
@@ -744,7 +773,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
     }
 
-    // Metodi luo historiatietojen taulukon
+    /**
+     * Creates the history table for displaying simulation results.
+     *
+     * @return the created TableView
+     */
     private TableView<Tulokset> createHistoryTable() {
         TableView<Tulokset> table = new TableView<>();
         table.setMinWidth(800);
@@ -769,7 +802,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         return table;
     }
 
-    // Metodi luo gridin täällä jota kutsutaan start metodissa
+    /**
+     * Creates the information grid for the user interface.
+     *
+     * @return the created GridPane
+     */
     private GridPane createInfoGrid() {
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(5));
@@ -792,7 +829,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         return grid;
     }
 
-    // Metodi jota käytetään start metodissa luomaan perustiedot
+    /**
+     * Adds general information labels and fields to the grid.
+     *
+     * @param grid the GridPane to add the information to
+     */
     private void addGeneralInfo(GridPane grid) {
         grid.add(aikaLabel, 0, 0);
         grid.add(aika, 1, 0);
@@ -804,7 +845,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         grid.add(palvellutAsiakasMaara, 1, 3);
     }
 
-    // Metodi jota käytetään start metodissa luomaan ikä tiedot
+    /**
+     * Adds age-related information labels and fields to the grid.
+     *
+     * @param grid the GridPane to add the information to
+     */
     private void addAgeInfo(GridPane grid) {
         ikaKeskPalveluaika.setPrefWidth(300);
         grid.add(ikaKeskPalveluaika, 0, 4, 2, 1);
@@ -816,7 +861,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         grid.add(tulosIkaVanha, 1, 7);
     }
 
-    // Metodi jota käytetään start metodissa palvelupisteiden tietoja varten
+    /**
+     * Adds service point information labels and fields to the grid.
+     *
+     * @param grid the GridPane to add the information to
+     */
     private void addServicePointInfo(GridPane grid) {
         // PAKETTIAUTOMAATTI
         addServicePointSection(grid, 8, palvelunValintaLabel, jonossaLabel, jonossa,
@@ -839,7 +888,13 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                 ETkeskimPalveluAikaLabel, ETkeskimPalveluAika, ETkokonaisAikaLabel, ETkokonaisAika);
     }
 
-    // Sama homma kun ylempi metodi
+    /**
+     * Adds a section of service point information to the grid.
+     *
+     * @param grid the GridPane to add the section to
+     * @param startRow the starting row for the section
+     * @param labels the labels to add to the section
+     */
     private void addServicePointSection(GridPane grid, int startRow, Label... labels) {
         grid.add(labels[0], 0, startRow, 2, 1);
         labels[0].setPrefWidth(300);
@@ -849,6 +904,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             grid.add(labels[i + 1], 1, startRow + (i + 1) / 2);
         }
     }
+    /**
+     * Shows an alert with the specified message.
+     *
+     * @param message the message to display in the alert
+     */
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Invalid Input");
@@ -856,10 +916,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-
-    //Käyttöliittymän rajapintametodit (kutsutaan kontrollerista)
-
+    /**
+     * Gets the arrival probability from the input field.
+     *
+     * @return the arrival probability
+     */
     @Override
     public double getArrivalProbability() {
         try {
@@ -873,7 +934,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
         return 0.5; // Default value
     }
-
+    /**
+     * Gets the redirect probability from the input field.
+     *
+     * @return the redirect probability
+     */
     @Override
     public double getRedirectProbability() {
         try {
@@ -887,13 +952,23 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         }
         return 0.5; // Default value
     }
-
+    /**
+     * Gets the distribution type for the specified service point.
+     *
+     * @param servicePoint the index of the service point
+     * @return the distribution type
+     */
     @Override
     public String getDistributionType(int servicePoint) {
         return distributionTypes[servicePoint].getValue();
     }
     String[] servicePointNames = {"Pakettiautomaatti", "Palvelunvalinta", "Nouto/Lähetä", "Erityistapaukset"};
-
+    /**
+     * Gets the distribution mean for the specified service point.
+     *
+     * @param servicePoint the index of the service point
+     * @return the distribution mean
+     */
     @Override
     public double getDistributionMean(int servicePoint) {
         try {
@@ -904,7 +979,12 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             return 5.0; // Default value
         }
     }
-
+    /**
+     * Gets the distribution variance for the specified service point.
+     *
+     * @param servicePoint the index of the service point
+     * @return the distribution variance
+     */
     @Override
     public double getDistributionVariance(int servicePoint) {
         try {
@@ -915,7 +995,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             return 2.0; // Default value
         }
     }
-
+    /**
+     * Displays the history data in a table.
+     *
+     * @param data the list of Tulokset to display
+     */
     @Override
     public void naytaHistoriaData(List<Tulokset> data) {
         Platform.runLater(() -> {
@@ -927,7 +1011,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             }
         });
     }
-
+    /**
+     * Updates the history details view with the specified Tulokset.
+     *
+     * @param tulos the Tulokset to display in the details view
+     */
     @Override
     public void paivitaHistoriaYksityiskohdat(Tulokset tulos) {
         Platform.runLater(() -> {
@@ -936,7 +1024,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             }
         });
     }
-
+    /**
+     * Gets the simulation time from the input field.
+     *
+     * @return the simulation time
+     */
     @Override
     public double getAika() {
         String input = aika.getText();
@@ -947,7 +1039,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             return 0;
         }
     }
-
+    /**
+     * Gets the delay time from the input field.
+     *
+     * @return the delay time
+     */
     @Override
     public long getViive() {
         String input = viive.getText();
@@ -958,135 +1054,252 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         return 0;
         }
     }
-
+    /**
+     * Sets the total simulation time.
+     *
+     * @param aika the total simulation time
+     */
     @Override
     public void setLoppuaika(double aika) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.tulos.setText(formatter.format(aika));
     }
-
+    /**
+     * Sets the total simulation time for young customers.
+     *
+     * @param aika the total simulation time for young customers
+     */
     @Override
     public void setLoppuaikaNuori(double aika) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.tulosIkaNuori.setText(formatter.format(aika));
     }
+    /**
+     * Sets the total simulation time for middle-aged customers.
+     *
+     * @param aika the total simulation time for middle-aged customers
+     */
     @Override
     public void setLoppuaikaKeski(double aika) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.tulosIkaKeski.setText(formatter.format(aika));
     }
+    /**
+     * Sets the total simulation time for old customers.
+     *
+     * @param aika the total simulation time for old customers
+     */
     @Override
     public void setLoppuaikaVanha(double aika) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.tulosIkaVanha.setText(formatter.format(aika));
     }
-
+    /**
+     * Updates the total number of served customers.
+     *
+     * @param TotalServedCustomers the total number of served customers
+     */
     @Override
     public void paivitaAsiakasMaara(int TotalServedCustomers) {
         this.palvellutAsiakasMaara.setText(Integer.toString(TotalServedCustomers));
     }
-
-    // PAKETTIAUTOMAATTI
+    /**
+     * Updates the queue length for the package machine.
+     *
+     * @param queueLength the queue length
+     */
     @Override
     public void paivitaJonoPituus(int queueLength) {
         this.jonossa.setText(Integer.toString(queueLength));
     }
+    /**
+     * Updates the number of served customers for the package machine.
+     *
+     * @param servedCustomers the number of served customers
+     */
     @Override
     public void paivitaPalveltuMaara(int servedCustomers) {
         this.palveluMaara.setText(Integer.toString(servedCustomers));
     }
-
+    /**
+     * Updates the average waiting time for the package machine.
+     *
+     * @param averageWaitingTime the average waiting time
+     */
     @Override
     public void paivitaKeskimJonoAika(double averageWaitingTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.keskimJonoAika.setText(formatter.format(averageWaitingTime));
     }
+    /**
+     * Updates the average service time for the package machine.
+     *
+     * @param averageServiceTime the average service time
+     */
     @Override
     public void paivitaKeskimPalveluAika(double averageServiceTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.keskimPalveluAika.setText(formatter.format(averageServiceTime));
     }
+    /**
+     * Updates the total time for the package machine.
+     *
+     * @param totalTime the total time
+     */
     @Override
     public void paivitaKokonaisAika(double totalTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.kokonaisAika.setText(formatter.format(totalTime));
     }
 
-    // PALVELUNVALINTA
+    /**
+     * Updates the queue length for the service selection.
+     *
+     * @param queueLength the queue length
+     */
     @Override
     public void PVpaivitaJonoPituus(int queueLength) {
         this.PVjonossa.setText(Integer.toString(queueLength));
     }
+    /**
+     * Updates the number of served customers for the service selection.
+     *
+     * @param servedCustomers the number of served customers
+     */
     @Override
     public void PVpaivitaPalveltuMaara(int servedCustomers) {
         this.PVpalveluMaara.setText(Integer.toString(servedCustomers));
     }
+    /**
+     * Updates the average waiting time for the service selection.
+     *
+     * @param averageWaitingTime the average waiting time
+     */
     @Override
     public void PVpaivitaKeskimJonoAika(double averageWaitingTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.PVkeskimJonoAika.setText(formatter.format(averageWaitingTime));
     }
+    /**
+     * Updates the average service time for the service selection.
+     *
+     * @param averageServiceTime the average service time
+     */
     @Override
     public void PVpaivitaKeskimPalveluAika(double averageServiceTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.PVkeskimPalveluAika.setText(formatter.format(averageServiceTime));
     }
+    /**
+     * Updates the total time for the service selection.
+     *
+     * @param totalTime the total time
+     */
     @Override
     public void PVpaivitaKokonaisAika(double totalTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.PVkokonaisAika.setText(formatter.format(totalTime));
     }
-
-    // NOUTOLÄHETÄ
+    /**
+     * Updates the queue length for the pickup/send service.
+     *
+     * @param queueLength the queue length
+     */
     @Override
     public void NTpaivitaJonoPituus(int queueLength) {
         this.NTjonossa.setText(Integer.toString(queueLength));
     }
+    /**
+     * Updates the number of served customers for the pickup/send service.
+     *
+     * @param servedCustomers the number of served customers
+     */
     @Override
     public void NTpaivitaPalveltuMaara(int servedCustomers) {
         this.NTpalveluMaara.setText(Integer.toString(servedCustomers));
     }
+    /**
+     * Updates the average waiting time for the pickup/send service.
+     *
+     * @param averageWaitingTime the average waiting time
+     */
     @Override
     public void NTpaivitaKeskimJonoAika(double averageWaitingTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.NTkeskimJonoAika.setText(formatter.format(averageWaitingTime));
     }
+    /**
+     * Updates the average service time for the pickup/send service.
+     *
+     * @param averageServiceTime the average service time
+     */
     @Override
     public void NTpaivitaKeskimPalveluAika(double averageServiceTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.NTkeskimPalveluAika.setText(formatter.format(averageServiceTime));
     }
+    /**
+     * Updates the total time for the pickup/send service.
+     *
+     * @param totalTime the total time
+     */
     @Override
     public void NTpaivitaKokonaisAika(double totalTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.NTkokonaisAika.setText(formatter.format(totalTime));
     }
 
-    // ERITYISTAPAUKSET
+    /**
+     * Updates the queue length for the special cases service.
+     *
+     * @param queueLength the queue length
+     */
     @Override
     public void ETpaivitaJonoPituus(int queueLength) {
         this.ETjonossa.setText(Integer.toString(queueLength));
     }
+    /**
+     * Updates the number of served customers for the special cases service.
+     *
+     * @param servedCustomers the number of served customers
+     */
     @Override
     public void ETpaivitaPalveltuMaara(int servedCustomers) {
         this.ETpalveluMaara.setText(Integer.toString(servedCustomers));
     }
+    /**
+     * Updates the average waiting time for the special cases service.
+     *
+     * @param averageWaitingTime the average waiting time
+     */
     @Override
     public void ETpaivitaKeskimJonoAika(double averageWaitingTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.ETkeskimJonoAika.setText(formatter.format(averageWaitingTime));
     }
+    /**
+     * Updates the average service time for the special cases service.
+     *
+     * @param averageServiceTime the average service time
+     */
     @Override
     public void ETpaivitaKeskimPalveluAika(double averageServiceTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.ETkeskimPalveluAika.setText(formatter.format(averageServiceTime));
     }
+    /**
+     * Updates the total time for the special cases service.
+     *
+     * @param totalTime the total time
+     */
     @Override
     public void ETpaivitaKokonaisAika(double totalTime) {
         DecimalFormat formatter = new DecimalFormat("#0.00");
         this.ETkokonaisAika.setText(formatter.format(totalTime));
     }
-
+    /**
+     * Disables the input fields for simulation time and delay.
+     */
     @Override
     public void disableInputFields() {
         Platform.runLater(() -> {
@@ -1094,7 +1307,9 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             viive.setDisable(true);
         });
     }
-
+    /**
+     * Enables the input fields for simulation time and delay.
+     */
     @Override
     public void enableInputFields() {
         Platform.runLater(() -> {
@@ -1102,7 +1317,11 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
             viive.setDisable(false);
         });
     }
-
+    /**
+     * Gets the visualization interface.
+     *
+     * @return the visualization interface
+     */
     @Override
     public IVisualisointi getVisualisointi() {
         return naytto;

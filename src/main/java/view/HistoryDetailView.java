@@ -10,15 +10,25 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.text.DecimalFormat;
-
+/**
+ * HistoryDetailView class displays detailed information about the simulation results.
+ */
 public class HistoryDetailView extends VBox {
 
+    /**
+     * Constructs a new HistoryDetailView.
+     */
     public HistoryDetailView() {
         setPadding(new Insets(10));
         setStyle("-fx-background-color: #f0f0f0;");
         setPrefWidth(400);
     }
 
+    /**
+     * Updates the details view with the provided simulation results.
+     *
+     * @param result the simulation results to display
+     */
     public void updateDetails(Tulokset result) {
         getChildren().clear();
         if (result == null) return;
@@ -37,6 +47,12 @@ public class HistoryDetailView extends VBox {
         addDetailRow("61v +:", pit.getHighAge());
     }
 
+    /**
+     * Adds service point details to the view.
+     *
+     * @param title the title of the service point section
+     * @param tulos the service point results to display
+     */
     private void addServicePointDetails(String title, IServicePointTulos tulos) {
         addSectionHeader(title);
         addDetailRow("Jonossa:", tulos.getJonossa());
@@ -50,12 +66,23 @@ public class HistoryDetailView extends VBox {
         addSeparator();
     }
 
+    /**
+     * Adds a section header to the view.
+     *
+     * @param text the text of the section header
+     */
     private void addSectionHeader(String text) {
         Label header = new Label(text);
         header.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 5 0 5 0;");
         getChildren().add(header);
     }
 
+    /**
+     * Adds a detail row with a numeric value to the view.
+     *
+     * @param label the label of the detail row
+     * @param value the numeric value of the detail row
+     */
     private void addDetailRow(String label, Number value) {
         DecimalFormat df = new DecimalFormat("#0.00");
         HBox row = new HBox(10);
@@ -66,6 +93,12 @@ public class HistoryDetailView extends VBox {
         getChildren().add(row);
     }
 
+    /**
+     * Adds a detail row with a string value to the view.
+     *
+     * @param label the label of the detail row
+     * @param value the string value of the detail row
+     */
     private void addDetailRow(String label, String value) {
         HBox row = new HBox(10);
         Label labelNode = new Label(label);
@@ -75,6 +108,9 @@ public class HistoryDetailView extends VBox {
         getChildren().add(row);
     }
 
+    /**
+     * Adds a separator to the view.
+     */
     private void addSeparator() {
         Separator separator = new Separator();
         separator.setPadding(new Insets(5, 0, 5, 0));

@@ -13,7 +13,9 @@ import javafx.util.Duration;
 
 
 import java.util.*;
-
+/**
+ * Visualisointi class handles the visualization of the simulation on a canvas.
+ */
 public class Visualisointi extends Canvas implements IVisualisointi{
 
     private final GraphicsContext gc;
@@ -47,7 +49,14 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
     private static final Image CUSTOMER_IMAGE = new Image("/customer.png",
             CUSTOMER_RADIUS * 2, CUSTOMER_RADIUS * 2, true, true);
-
+    /**
+     * Constructor for Visualisointi.
+     *
+     * @param w    the width of the canvas
+     * @param h    the height of the canvas
+     * @param root the root BorderPane
+     * @param ui   the UI interface
+     */
     public Visualisointi(int w, int h, BorderPane root, ISimulaattorinUI ui) {
         super(w, h);
         if (root == null) {
@@ -63,6 +72,9 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
         initializeCanvas();
     }
+    /**
+     * Loads images for the visualization.
+     */
     private void loadImages() {
         entryImage = new Image(getClass().getResourceAsStream("/entry.png"));
         ntImage = new Image(getClass().getResourceAsStream("/serviceDesk.png"));
@@ -72,7 +84,9 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         exitImage = new Image(getClass().getResourceAsStream("/exit.png"));
     }
 
-    // Metodi joka alustaa canvaksen
+    /**
+     * Initializes the canvas properties and bindings.
+     */
     private void initializeCanvas() {
         widthProperty().bind(root.widthProperty());
         heightProperty().bind(root.heightProperty());
@@ -82,77 +96,125 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
         updateCanvas();
     }
-
+    /**
+     * Gets the animation duration based on the current delay.
+     *
+     * @return the animation duration
+     */
     private double getAnimationDuration() {
         double currentViive = ui.getViive();
         if (currentViive > 100) {
             return 1.0; // Normal speed for viive > 200
         }
-        // Scale down duration only for very fast speeds
         return Math.max(0.2, currentViive / 200.0);
     }
-
-
-    // Canvaksen päivitys kun ikkunan kokoa muutetaan
+    /**
+     * Updates the canvas when the window size changes.
+     */
     public void updateCanvas() {
         tyhjennaNaytto();
         visualisoiPalvelupisteet();
     }
-    // Alustetaan näyttö
+    /**
+     * Clears the canvas.
+     */
     public void tyhjennaNaytto() {
         gc.setFill(Color.SANDYBROWN);
         gc.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
-
+    /**
+     * Visualizes the starting point on the canvas.
+     */
     public void visualisoiAloitus() {
         gc.setFill(Color.BROWN);
         gc.drawImage(entryImage, 0,this.getHeight()/2, 100, 100);
     }
+    /**
+     * Gets the coordinates for the starting point.
+     *
+     * @return the coordinates for the starting point
+     */
     public Point2D AloitusCoord() {
         return new Point2D((root.getWidth()-this.getWidth()), ((root.getHeight()-this.getHeight()) + (this.getHeight()/2)-30));
         // vähennetään rootin leveys canvaksen leveydestä, jotta saadaan aloitus canvaksen vasempaan reunaan.
     }
-
+    /**
+     * Visualizes the package machine on the canvas.
+     */
     public void visualisoiPA() {
         gc.drawImage(paImage, (this.getWidth()/4), (this.getHeight()/3 + this.getHeight()/3), 100, 130);
         gc.fillText("Pakettiautomaatti", (this.getWidth()/4), (this.getHeight()/3 + this.getHeight()/3) - 10);
     }
-
+    /**
+     * Gets the coordinates for the package machine.
+     *
+     * @return the coordinates for the package machine
+     */
     public Point2D PACoord() {
         return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/4)) - CUSTOMER_RADIUS, ((root.getHeight()-this.getHeight()) +(this.getHeight()/3 + this.getHeight()/3)) - 25 );
     }
-
+    /**
+     * Visualizes the service selection on the canvas.
+     */
     public void visualisoiPV() {
         gc.drawImage(pvImage, (this.getWidth()/4), (this.getHeight()/3), 100, 130);
         gc.fillText("Palvelunvalinta", (this.getWidth()/4), (this.getHeight()/3) - 10);
     }
+    /**
+     * Gets the coordinates for the service selection.
+     *
+     * @return the coordinates for the service selection
+     */
     public Point2D PVCoord() {
         return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/4)) - CUSTOMER_RADIUS, ((root.getHeight() - this.getHeight()) + this.getHeight()/3) - 25);
     }
-
+    /**
+     * Visualizes the pickup/send service on the canvas.
+     */
     public void visualisoiNT() {
         gc.drawImage(ntImage, (this.getWidth()/3), 0, 130, 80);
         gc.fillText("Nouto/Lähetä", (this.getWidth()/3), 90);
     }
+    /**
+     * Gets the coordinates for the pickup/send service.
+     *
+     * @return the coordinates for the pickup/send service
+     */
     public Point2D NTCoord() {
         return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/3)) + 50, (root.getHeight() - this.getHeight()));
     }
-
+    /**
+     * Visualizes the special cases service on the canvas.
+     */
     public void visualisoiET() {
         gc.drawImage(etImage, (this.getWidth()/3 + this.getWidth()/3), 0, 130, 80);
         gc.fillText("Erikoistapaukset", (this.getWidth()/3 + this.getWidth()/3), 90);
     }
+    /**
+     * Gets the coordinates for the special cases service.
+     *
+     * @return the coordinates for the special cases service
+     */
     public Point2D ETCoord() {
         return new Point2D((((root.getWidth()-this.getWidth()) + (this.getWidth())/3) + (this.getWidth()/3)) + 50, (root.getHeight() - this.getHeight()));
     }
-
+    /**
+     * Visualizes the exit point on the canvas.
+     */
     public void visualisoiExit() {
         gc.drawImage(exitImage, this.getWidth()-100, (this.getHeight()/2), 100, 80);
     }
+    /**
+     * Gets the coordinates for the exit point.
+     *
+     * @return the coordinates for the exit point
+     */
     public Point2D ExitCoord() {
         return new Point2D((root.getWidth()-40), ((root.getHeight() - this.getHeight()) + (this.getHeight()/2)-30));
     }
-
+    /**
+     * Visualizes all service points on the canvas.
+     */
     public void visualisoiPalvelupisteet() {
         visualisoiAloitus();
         visualisoiPA();
@@ -162,8 +224,9 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         visualisoiExit();
     }
 
-    // Animaatio hommelit siirretty tänne
-
+    /**
+     * Cleans up the canvas and stops all animations.
+     */
     @Override
     public void cleanUp() {
         Platform.runLater(() -> {
@@ -181,7 +244,13 @@ public class Visualisointi extends Canvas implements IVisualisointi{
             }
         });
     }
-
+    /**
+     * Draws a customer on the canvas.
+     *
+     * @param id     the customer ID
+     * @param areaX  the X coordinate of the area
+     * @param areaY  the Y coordinate of the area
+     */
     @Override
     public void drawCustomer(int id, double areaX, double areaY) {
         double x = areaX + (areaWidth - CUSTOMER_RADIUS * 2) / 2;
@@ -203,12 +272,25 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         fadeIn.play();
     }
 
-    // Pikku tälläne handleri jos asiakasta ei löydy (ei pitäisi tapahtua mutta kuiteski)
+    /**
+     * Handles the case when a customer is not found.
+     *
+     * @param id the customer ID
+     */
     private void handleCustomerNotFound(int id) {
         System.err.println("Customer with ID " + id + " not found");
     }
 
     // Animaatio asiakkaan liikuttamiseen siirretty omaan metodiin, koska paljon eri logiikkaa siinä
+    /**
+     * Animates a customer moving to a new position.
+     *
+     * @param customer       the customer ImageView
+     * @param toX            the target X coordinate
+     * @param toY            the target Y coordinate
+     * @param shouldFadeOut  whether the customer should fade out after moving
+     * @param onFinished     the callback to run when the animation is finished
+     */
     private void animateCustomer(ImageView customer, double toX, double toY, boolean shouldFadeOut, Runnable onFinished) {
 
         double deltaX = (toX - CUSTOMER_RADIUS) - customer.getX();
@@ -237,7 +319,12 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         timeline.play();
     }
 
-    // Fade animaatiolla ja asiakkaan poistamiselle oma metodi
+    /**
+     * Fades out and removes a customer from the canvas.
+     *
+     * @param customer   the customer ImageView
+     * @param onFinished the callback to run when the fade-out is finished
+     */
     private void fadeOutAndRemove(ImageView customer, Runnable onFinished) {
         FadeTransition fadeTransition = new FadeTransition(Duration.millis(FADE_DURATION), customer);
         fadeTransition.setToValue(0);
@@ -248,7 +335,11 @@ public class Visualisointi extends Canvas implements IVisualisointi{
         fadeTransition.play();
     }
 
-    // Animaation lopetus
+    /**
+     * Finishes the animation and runs the callback if provided.
+     *
+     * @param onFinished the callback to run when the animation is finished
+     */
     private void finishAnimation(Runnable onFinished) {
         if (onFinished != null) {
             onFinished.run();
@@ -258,14 +349,22 @@ public class Visualisointi extends Canvas implements IVisualisointi{
             completionCallback = null;
         }
     }
-
+    /**
+     * Checks if there are any active animations.
+     *
+     * @return true if there are active animations, false otherwise
+     */
     @Override
     public boolean isAnimating() {
         synchronized (animationLock) {
             return !activeAnimations.isEmpty();
         }
     }
-
+    /**
+     * Sets a callback to be run when all animations are complete.
+     *
+     * @param callback the callback to run
+     */
     @Override
     public void onAllAnimationsComplete(Runnable callback) {
         this.completionCallback = callback;
@@ -273,7 +372,14 @@ public class Visualisointi extends Canvas implements IVisualisointi{
 
 
     // Movecustomer ja exitcustomer hyödyntää uusia metodeja animaatiolle
-
+    /**
+     * Moves a customer to a new position.
+     *
+     * @param id         the customer ID
+     * @param toX        the target X coordinate
+     * @param toY        the target Y coordinate
+     * @param onFinished the callback to run when the move is finished
+     */
     @Override
     public void moveCustomer(int id, double toX, double toY, Runnable onFinished) {
         Platform.runLater(() -> {
@@ -287,7 +393,13 @@ public class Visualisointi extends Canvas implements IVisualisointi{
             }
         });
     }
-
+    /**
+     * Exits a customer from the canvas.
+     *
+     * @param id  the customer ID
+     * @param toX the target X coordinate
+     * @param toY the target Y coordinate
+     */
     @Override
     public void exitCustomer(int id, double toX, double toY) {
         ImageView customer = (ImageView) root.lookup("#customer-" + id);
@@ -297,7 +409,9 @@ public class Visualisointi extends Canvas implements IVisualisointi{
             handleCustomerNotFound(id);
         }
     }
-
+    /**
+     * Pauses all active animations.
+     */
     @Override
     public void pauseAnimation() {
         Platform.runLater(() -> {
@@ -308,7 +422,9 @@ public class Visualisointi extends Canvas implements IVisualisointi{
             }
         });
     }
-
+    /**
+     * Resumes all paused animations.
+     */
     @Override
     public void resumeAnimation() {
         Platform.runLater(() -> {
