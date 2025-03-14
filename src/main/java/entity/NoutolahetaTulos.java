@@ -3,7 +3,7 @@ package entity;
 import jakarta.persistence.*;
 
 /**
- * Entity class representing pickup and dispatch (Noutolähettämö) results in the simulation.
+ * Entity class representing pickup and dispatch (Nouto/lähetä) results in the simulation.
  * Maps to the "noutolaheta" table in the database using JPA/Hibernate annotations.
  * Implements IServicePointTulos interface for standardized service point result handling.
  */
