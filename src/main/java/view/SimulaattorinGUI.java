@@ -218,7 +218,8 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
                 jatkaButton.setDisable(false);
             });
 
-            setButton = createButton("Set", e -> kontrolleri.set());
+            // Napin nimet ja muut metodit lukevat "set", mutta pitäisi olla "step"
+            setButton = createButton("Step", e -> kontrolleri.set());
             historyButton = createButton("History", e -> kontrolleri.naytaHistoriaData());
 
             stopButton = new Button();

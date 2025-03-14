@@ -9,9 +9,21 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
 
 
-
+/**
+ * Data Access Object class for managing simulation results (Tulokset) in the database.
+ * Implements the IDao interface to provide CRUD operations for simulation results.
+ * Uses JPA/Hibernate for database operations through EntityManager.
+ */
 public class TuloksetDao implements IDao {
 
+    /**
+     * Saves a new simulation result to the database.
+     * The method clears the persistence context and detaches any managed entity before persisting
+     * to ensure clean state.
+     *
+     * @param tulokset The simulation results object to be saved
+     * @throws RuntimeException if the database operation fails
+     */
     @Override
     public void tallenna(Tulokset tulokset) {
         EntityManager em = DatabaseConnection.getInstance();
@@ -34,6 +46,12 @@ public class TuloksetDao implements IDao {
         }
     }
 
+    /**
+     * Retrieves all simulation results from the database.
+     *
+     * @return List of all Tulokset objects stored in the database
+     * @throws RuntimeException if the database operation fails
+     */
     @Override
     public List<Tulokset> lataaKaikki() {
         EntityManager em = DatabaseConnection.getInstance();
@@ -45,6 +63,13 @@ public class TuloksetDao implements IDao {
         }
     }
 
+    /**
+     * Truncates (removes all records) from all simulation-related tables in the database.
+     * Tables affected: simuloinnit, erityistapaukset, noutolaheta, pakettiautomaatti,
+     * palvelunvalinta, and palveluaika_ika.
+     *
+     * @throws RuntimeException if the database operation fails
+     */
     @Override
     public void truncateAll() {
         EntityManager em = DatabaseConnection.getInstance();
@@ -65,6 +90,13 @@ public class TuloksetDao implements IDao {
         }
     }
 
+    /**
+     * Deletes a specific simulation result from the database.
+     * The method merges the entity first to ensure it's in managed state before removal.
+     *
+     * @param tulos The simulation result object to be deleted
+     * @return true if deletion was successful, false if it failed
+     */
     @Override
     public boolean deleteTulos(Tulokset tulos) {
         EntityManager em = DatabaseConnection.getInstance();
