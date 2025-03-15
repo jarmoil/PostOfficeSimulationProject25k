@@ -508,7 +508,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         distributionGrid.add(arrivalProbField, 2, 0, 2, 1);
 
         // Add redirect probability input
-        Label redirectLabel = new Label("Todennäköisyys\npalvelupisteelle nouto/lähetä (0-1):");
+        Label redirectLabel = new Label("Todennäköisyys\npalvelunvalinnalle (0-1):");
         redirectLabel.setWrapText(true);
         redirectLabel.setMaxWidth(200);
         redirectProbField = new TextField("0.5");
@@ -786,7 +786,7 @@ public class SimulaattorinGUI extends Application implements ISimulaattorinUI {
         TableColumn<Tulokset, Double> timeCol = new TableColumn<>("Kokonaisaika");
         TableColumn<Tulokset, Integer> servedCol = new TableColumn<>("Palveltu");
         TableColumn<Tulokset, Double> bernoulliArrival = new TableColumn<>("Todennäköisyys pakettiautomaatille");
-        TableColumn<Tulokset, Double> bernoulliRedirect = new TableColumn<>("Todennäköisyys nouto/lähetä");
+        TableColumn<Tulokset, Double> bernoulliRedirect = new TableColumn<>("Todennäköisyys palvelunvalinnalle");
         TableColumn<Tulokset, Double> inputAika = new TableColumn<>("Syötetty Aika");
         TableColumn<Tulokset, Long> inputViive = new TableColumn<>("Syötetty Viive");
 
